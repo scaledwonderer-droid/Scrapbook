@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FFXIV Adventurer's Scrapbook</title>
+  <style>
+    :root {
+      --bg: #f3efe7;
+      --panel: #ffffff;
+      --ink: #2f2a24;
+      --muted: #756b5f;
+      --line: #d8cdbf;
+      --accent: #4c7f8f;
+      --accent2: #b57955;
+      --danger: #9f4f43;
+      --shadow: 0 18px 45px rgba(44, 35, 24, 0.16);
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(76,127,143,.16), transparent 34%),
+        radial-gradient(circle at bottom right, rgba(181,121,85,.15), transparent 35%),
+        var(--bg);
+      min-height: 100vh;
+    }
+
+    header {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 28px 18px 12px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: clamp(24px, 3vw, 36px);
+      letter-spacing: .02em;
+    }
+
+    .lead {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 14px;
+    }
+
+    main {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 18px;
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .panel, .preview-wrap {
+      background: rgba(255,255,255,.88);
+      border: 1px solid rgba(216,205,191,.9);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(8px);
+    }
+
+    .panel {
+      padding: 18px;
+    }
+
+    .section {
+      padding: 14px 0;
+      border-top: 1px solid var(--line);
+    }
+
+    .section:first-child { border-top: 0; padding-top: 0; }
+
+    .section-title {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 0 0 12px;
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: .04em;
+    }
+
+    .hint {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    label {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+      margin: 12px 0 6px;
+      font-weight: 700;
+    }
+
+    input[type="text"], select, textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 10px 11px;
+      background: #fffdf9;
+      color: var(--ink);
+      font: inherit;
+      outline: none;
+    }
+
+    textarea {
+      min-height: 110px;
+      resize: vertical;
+      line-height: 1.6;
+    }
+
+    input[type="text"]:focus, select:focus, textarea:focus {
+      border-color: rgba(76,127,143,.7);
+      box-shadow: 0 0 0 3px rgba(76,127,143,.13);
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .check-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .check-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 8px 9px;
+      background: #fffdf9;
+      font-size: 13px;
+      color: var(--ink);
+      user-select: none;
+    }
+
+    .check-item input { margin: 0; }
+
+    .file-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      align-items: center;
+      margin-top: 8px;
+    }
+
+    input[type="file"] {
+      width: 100%;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    button {
+      appearance: none;
+      border: 0;
+      border-radius: 999px;
+      padding: 10px 14px;
+      cursor: pointer;
+      font-weight: 800;
+      letter-spacing: .02em;
+      color: white;
+      background: var(--accent);
+      transition: transform .08s ease, filter .15s ease;
+    }
+
+    button:hover { filter: brightness(1.04); }
+    button:active { transform: translateY(1px); }
+
+    button.secondary {
+      background: #8b8177;
+      padding: 8px 11px;
+      font-size: 12px;
+    }
+
+    button.danger { background: var(--danger); }
+
+    .preview-wrap {
+      padding: 18px;
+      position: sticky;
+      top: 18px;
+    }
+
+    .canvas-shell {
+      width: 100%;
+      overflow: hidden;
+      border-radius: 16px;
+      background: #e7ded1;
+      border: 1px solid var(--line);
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: auto;
+      cursor: grab;
+    }
+
+    canvas.dragging { cursor: grabbing; }
+
+    .preview-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 12px;
+    }
+
+    .small-note {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+      margin: 8px 0 0;
+    }
+
+    footer {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 8px 18px 30px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.7;
+    }
+
+    @media (max-width: 980px) {
+      main { grid-template-columns: 1fr; }
+      .preview-wrap { position: static; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>FFXIV Adventurer's Scrapbook</h1>
+    <p class="lead">旅人の机の上に広げた記録帳風のプロフィール画像を作る、非公式ファンツールです。画像と入力内容はブラウザ内で処理され、サーバーには保存されません。</p>
+  </header>
+
+  <main>
+    <section class="panel" aria-label="入力欄">
+      <div class="section">
+        <h2 class="section-title">Aetheryte Pass <span class="hint">左側の基本情報</span></h2>
+
+        <label for="charImage">キャラクターSS</label>
+        <div class="file-row">
+          <input id="charImage" type="file" accept="image/*" />
+          <button class="secondary danger" type="button" data-clear="char">削除</button>
+        </div>
+
+        <label for="charZoom">キャラクターSSズーム</label>
+        <input id="charZoom" type="range" min="100" max="180" value="112" />
+        <p class="small-note">Canvas上のキャラクターSS・小写真はドラッグで位置調整できます。</p>
+
+        <label for="charName">キャラクター名</label>
+        <input id="charName" type="text" maxlength="32" placeholder="例：Luca Kusakabe" />
+
+        <div class="grid-2">
+          <div>
+            <label for="dc">DC</label>
+            <input id="dc" type="text" value="Meteor" maxlength="20" />
+          </div>
+          <div>
+            <label for="world">World</label>
+            <input id="world" type="text" value="Shinryu" maxlength="20" />
+          </div>
+        </div>
+
+        <label for="mainJob">Main Job</label>
+        <input id="mainJob" type="text" value="Ninja" maxlength="24" />
+
+        <label for="qrImage">任意QRコード画像</label>
+        <div class="file-row">
+          <input id="qrImage" type="file" accept="image/*" />
+          <button class="secondary danger" type="button" data-clear="qr">削除</button>
+        </div>
+        <p class="small-note">QR画像はAetheryte Pass右下に小さく表示されます。未設定なら表示されません。</p>
+      </div>
+
+      <div class="section">
+        <h2 class="section-title">自由メモ <span class="hint">全角10文字×5行目安</span></h2>
+        <label for="memo">メモ</label>
+        <textarea id="memo" maxlength="80" placeholder="例：\n深夜多めです\nSS撮影好き\n零式練習中\nフレ募集中\n気軽にどうぞ"></textarea>
+        <p class="small-note">描画時に最大5行まで表示します。1行が長い場合は自動で折り返します。</p>
+      </div>
+
+      <div class="section">
+        <h2 class="section-title">宿レシート <span class="hint">定型情報</span></h2>
+
+        <label>Active Time</label>
+        <div class="check-grid" id="activeTimeBox">
+          <label class="check-item"><input type="checkbox" name="activeTime" value="Morning" />朝</label>
+          <label class="check-item"><input type="checkbox" name="activeTime" value="Day" />昼</label>
+          <label class="check-item"><input type="checkbox" name="activeTime" value="Evening" />夕方</label>
+          <label class="check-item"><input type="checkbox" name="activeTime" value="Night" checked />夜</label>
+          <label class="check-item"><input type="checkbox" name="activeTime" value="Late" />深夜</label>
+        </div>
+
+        <label for="vc">VC可否</label>
+        <select id="vc">
+          <option value="OK">OK</option>
+          <option value="NG" selected>NG</option>
+          <option value="Listen Only">聞き専</option>
+          <option value="Ask">要相談</option>
+        </select>
+
+        <label>使用言語</label>
+        <div class="check-grid" id="languageBox">
+          <label class="check-item"><input type="checkbox" name="language" value="JP" checked />JP</label>
+          <label class="check-item"><input type="checkbox" name="language" value="EN" />EN</label>
+          <label class="check-item"><input type="checkbox" name="language" value="CN" />CN</label>
+          <label class="check-item"><input type="checkbox" name="language" value="KR" />KR</label>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2 class="section-title">小写真 <span class="hint">右側に2枚</span></h2>
+
+        <label for="photo1">小写真 1</label>
+        <div class="file-row">
+          <input id="photo1" type="file" accept="image/*" />
+          <button class="secondary danger" type="button" data-clear="photo1">削除</button>
+        </div>
+        <label for="photo1Zoom">小写真 1 ズーム</label>
+        <input id="photo1Zoom" type="range" min="100" max="180" value="110" />
+        <label for="caption1">小写真 1 キャプション</label>
+        <input id="caption1" type="text" maxlength="14" placeholder="例：my room" />
+
+        <label for="photo2">小写真 2</label>
+        <div class="file-row">
+          <input id="photo2" type="file" accept="image/*" />
+          <button class="secondary danger" type="button" data-clear="photo2">削除</button>
+        </div>
+        <label for="photo2Zoom">小写真 2 ズーム</label>
+        <input id="photo2Zoom" type="range" min="100" max="180" value="110" />
+        <label for="caption2">小写真 2 キャプション</label>
+        <input id="caption2" type="text" maxlength="14" placeholder="例：friends" />
+      </div>
+    </section>
+
+    <section class="preview-wrap" aria-label="プレビュー">
+      <div class="canvas-shell">
+        <canvas id="cardCanvas" width="1200" height="675" aria-label="生成画像プレビュー"></canvas>
+      </div>
+      <div class="preview-actions">
+        <button id="downloadBtn" type="button">PNG保存</button>
+        <span class="hint">1200×675px / 16:9</span>
+      </div>
+      <p class="small-note">このツールは非公式ファンツールです。FINAL FANTASY XIVおよび関連する名称の権利は各権利者に帰属します。</p>
+    </section>
+  </main>
+
+  <footer>
+    非公式ファンツールです。SQUARE ENIXおよびFINAL FANTASY XIV公式とは関係ありません。公式素材・公式アイコンは使用していません。生成画像の利用時は、FINAL FANTASY XIVの利用規約・素材利用条件・各コミュニティのルールを確認してください。
+  </footer>
+
+  <script>
+    const canvas = document.getElementById('cardCanvas');
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width;
+    const H = canvas.height;
+
+    const els = {
+      charImage: document.getElementById('charImage'),
+      qrImage: document.getElementById('qrImage'),
+      photo1: document.getElementById('photo1'),
+      photo2: document.getElementById('photo2'),
+      charZoom: document.getElementById('charZoom'),
+      photo1Zoom: document.getElementById('photo1Zoom'),
+      photo2Zoom: document.getElementById('photo2Zoom'),
+      charName: document.getElementById('charName'),
+      dc: document.getElementById('dc'),
+      world: document.getElementById('world'),
+      mainJob: document.getElementById('mainJob'),
+      memo: document.getElementById('memo'),
+      vc: document.getElementById('vc'),
+      caption1: document.getElementById('caption1'),
+      caption2: document.getElementById('caption2'),
+      downloadBtn: document.getElementById('downloadBtn')
+    };
+
+    const images = {
+      char: null,
+      qr: null,
+      photo1: null,
+      photo2: null
+    };
+
+    const imageState = {
+      char: { offsetX: 0, offsetY: 0 },
+      photo1: { offsetX: 0, offsetY: 0 },
+      photo2: { offsetX: 0, offsetY: 0 }
+    };
+
+    const hitAreas = {
+      char: { x: 92, y: 128, w: 384, h: 282 },
+      photo1: { x: 592, y: 384, w: 218, h: 122 },
+      photo2: { x: 862, y: 386, w: 218, h: 122 }
+    };
+
+    let dragTarget = null;
+    let lastPointer = null;
+
+    function value(id) {
+      return (els[id]?.value || '').trim();
+    }
+
+    function selectedValues(name) {
+      return Array.from(document.querySelectorAll(`input[name="${name}"]:checked`)).map(el => el.value);
+    }
+
+    function loadImageFromInput(input, key) {
+      const file = input.files && input.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        const img = new Image();
+        img.onload = () => {
+          images[key] = img;
+          if (imageState[key]) {
+            imageState[key].offsetX = 0;
+            imageState[key].offsetY = 0;
+          }
+          draw();
+        };
+        img.src = reader.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function clearImage(key) {
+      images[key] = null;
+      if (imageState[key]) {
+        imageState[key].offsetX = 0;
+        imageState[key].offsetY = 0;
+      }
+      const input = els[key === 'char' ? 'charImage' : key === 'qr' ? 'qrImage' : key];
+      if (input) input.value = '';
+      draw();
+    }
+
+    function roundRect(c, x, y, w, h, r) {
+      const radius = Math.min(r, w / 2, h / 2);
+      c.beginPath();
+      c.moveTo(x + radius, y);
+      c.arcTo(x + w, y, x + w, y + h, radius);
+      c.arcTo(x + w, y + h, x, y + h, radius);
+      c.arcTo(x, y + h, x, y, radius);
+      c.arcTo(x, y, x + w, y, radius);
+      c.closePath();
+    }
+
+    function drawShadowPaper(x, y, w, h, r, fill, stroke) {
+      ctx.save();
+      ctx.shadowColor = 'rgba(44, 35, 24, 0.22)';
+      ctx.shadowBlur = 22;
+      ctx.shadowOffsetY = 14;
+      roundRect(ctx, x, y, w, h, r);
+      ctx.fillStyle = fill;
+      ctx.fill();
+      ctx.shadowColor = 'transparent';
+      ctx.lineWidth = 1.5;
+      ctx.strokeStyle = stroke || 'rgba(95,76,54,.22)';
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawTape(x, y, w, h, rot) {
+      ctx.save();
+      ctx.translate(x + w / 2, y + h / 2);
+      ctx.rotate(rot || 0);
+      ctx.fillStyle = 'rgba(236, 222, 185, .72)';
+      ctx.strokeStyle = 'rgba(129, 110, 76, .18)';
+      ctx.lineWidth = 1;
+      roundRect(ctx, -w / 2, -h / 2, w, h, 5);
+      ctx.fill();
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawDeskBackground() {
+      const grad = ctx.createLinearGradient(0, 0, W, H);
+      grad.addColorStop(0, '#d9c7ad');
+      grad.addColorStop(.48, '#c8ad8d');
+      grad.addColorStop(1, '#9f7757');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, W, H);
+
+      ctx.globalAlpha = .16;
+      for (let i = 0; i < 34; i++) {
+        const x = (i * 137) % W;
+        const y = (i * 91) % H;
+        const w = 180 + (i % 5) * 40;
+        ctx.strokeStyle = i % 2 ? '#5f3c27' : '#f2dfc8';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(x - w, y);
+        ctx.bezierCurveTo(x - 50, y - 20, x + 80, y + 26, x + w, y - 8);
+        ctx.stroke();
+      }
+      ctx.globalAlpha = 1;
+
+      ctx.fillStyle = 'rgba(48, 31, 20, .17)';
+      ctx.fillRect(0, 0, W, H);
+    }
+
+    function drawFixedDecorations() {
+      // map fragment
+      ctx.save();
+      ctx.translate(930, 540);
+      ctx.rotate(-0.08);
+      drawShadowPaper(0, 0, 190, 92, 10, '#d8caa8', 'rgba(78,62,43,.22)');
+      ctx.strokeStyle = 'rgba(88, 116, 111, .45)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(18, 56);
+      ctx.bezierCurveTo(52, 30, 68, 74, 105, 42);
+      ctx.bezierCurveTo(130, 20, 150, 38, 172, 22);
+      ctx.stroke();
+      ctx.strokeStyle = 'rgba(100,73,48,.28)';
+      ctx.lineWidth = 1;
+      for (let x = 30; x < 180; x += 34) {
+        ctx.beginPath(); ctx.moveTo(x, 12); ctx.lineTo(x - 18, 82); ctx.stroke();
+      }
+      ctx.fillStyle = 'rgba(104,70,45,.35)';
+      ctx.beginPath(); ctx.arc(82, 50, 5, 0, Math.PI * 2); ctx.fill();
+      ctx.restore();
+
+      // compass coin
+      ctx.save();
+      ctx.translate(1095, 82);
+      ctx.rotate(.16);
+      ctx.shadowColor = 'rgba(44,35,24,.2)';
+      ctx.shadowBlur = 12;
+      ctx.fillStyle = '#c59c64';
+      ctx.beginPath(); ctx.arc(0, 0, 44, 0, Math.PI * 2); ctx.fill();
+      ctx.shadowColor = 'transparent';
+      ctx.strokeStyle = 'rgba(55,42,32,.38)';
+      ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.arc(0, 0, 34, 0, Math.PI * 2); ctx.stroke();
+      ctx.strokeStyle = 'rgba(55,42,32,.55)';
+      ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(0, -28); ctx.lineTo(8, 0); ctx.lineTo(0, 28); ctx.lineTo(-8, 0); ctx.closePath(); ctx.stroke();
+      ctx.font = '700 12px Georgia, serif';
+      ctx.textAlign = 'center';
+      ctx.fillStyle = 'rgba(55,42,32,.62)';
+      ctx.fillText('N', 0, -18);
+      ctx.restore();
+
+      // pressed leaf line art
+      ctx.save();
+      ctx.translate(520, 584);
+      ctx.rotate(.18);
+      ctx.strokeStyle = 'rgba(44, 96, 72, .48)';
+      ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(0, 58); ctx.quadraticCurveTo(24, 22, 64, 0); ctx.stroke();
+      for (let i = 0; i < 6; i++) {
+        const t = i * 10 + 8;
+        ctx.beginPath(); ctx.moveTo(t, 46 - i * 7); ctx.quadraticCurveTo(t - 22, 35 - i * 6, t - 8, 18 - i * 3); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(t + 5, 42 - i * 7); ctx.quadraticCurveTo(t + 24, 28 - i * 6, t + 18, 12 - i * 3); ctx.stroke();
+      }
+      ctx.restore();
+
+      // loose string
+      ctx.strokeStyle = 'rgba(68,48,34,.24)';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(30, 635);
+      ctx.bezierCurveTo(200, 590, 320, 685, 480, 615);
+      ctx.bezierCurveTo(570, 575, 610, 630, 680, 605);
+      ctx.stroke();
+    }
+
+    function drawImageCover(img, x, y, w, h, state, zoomValue) {
+      if (!img) return false;
+      const zoom = (Number(zoomValue) || 100) / 100;
+      const base = Math.max(w / img.width, h / img.height) * zoom;
+      const dw = img.width * base;
+      const dh = img.height * base;
+      const dx = x + (w - dw) / 2 + (state?.offsetX || 0);
+      const dy = y + (h - dh) / 2 + (state?.offsetY || 0);
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(x, y, w, h);
+      ctx.clip();
+      ctx.drawImage(img, dx, dy, dw, dh);
+      ctx.restore();
+      return true;
+    }
+
+    function drawImageContain(img, x, y, w, h) {
+      if (!img) return false;
+      const scale = Math.min(w / img.width, h / img.height);
+      const dw = img.width * scale;
+      const dh = img.height * scale;
+      const dx = x + (w - dw) / 2;
+      const dy = y + (h - dh) / 2;
+      ctx.save();
+      ctx.beginPath(); ctx.rect(x, y, w, h); ctx.clip();
+      ctx.drawImage(img, dx, dy, dw, dh);
+      ctx.restore();
+      return true;
+    }
+
+    function drawPlaceholder(x, y, w, h, label) {
+      ctx.save();
+      const grad = ctx.createLinearGradient(x, y, x + w, y + h);
+      grad.addColorStop(0, '#b9c4c1');
+      grad.addColorStop(1, '#738f92');
+      ctx.fillStyle = grad;
+      ctx.fillRect(x, y, w, h);
+      ctx.strokeStyle = 'rgba(255,255,255,.45)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(x + 25, y + h - 38);
+      ctx.lineTo(x + w * .38, y + h * .56);
+      ctx.lineTo(x + w * .53, y + h - 42);
+      ctx.lineTo(x + w - 24, y + h * .42);
+      ctx.lineTo(x + w - 24, y + h - 24);
+      ctx.lineTo(x + 25, y + h - 24);
+      ctx.closePath();
+      ctx.stroke();
+      ctx.beginPath(); ctx.arc(x + w - 62, y + 48, 18, 0, Math.PI * 2); ctx.stroke();
+      ctx.font = '800 18px system-ui, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillStyle = 'rgba(255,255,255,.78)';
+      ctx.fillText(label, x + w / 2, y + h / 2 + 6);
+      ctx.restore();
+    }
+
+    function fitText(text, maxWidth, baseSize, minSize, weight, family) {
+      let size = baseSize;
+      const safeText = text || '';
+      do {
+        ctx.font = `${weight || 800} ${size}px ${family || 'system-ui, sans-serif'}`;
+        if (ctx.measureText(safeText).width <= maxWidth) break;
+        size -= 1;
+      } while (size >= minSize);
+      return size;
+    }
+
+    function drawPassField(label, text, x, y, w) {
+      ctx.save();
+      ctx.fillStyle = 'rgba(80,64,48,.54)';
+      ctx.font = '800 11px system-ui, sans-serif';
+      ctx.letterSpacing = '0.06em';
+      ctx.fillText(label, x, y);
+      ctx.fillStyle = '#2f2a24';
+      const size = fitText(text || '—', w, 22, 12, 800);
+      ctx.font = `800 ${size}px system-ui, sans-serif`;
+      ctx.fillText(text || '—', x, y + 25);
+      ctx.strokeStyle = 'rgba(112,89,61,.26)';
+      ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(x, y + 35); ctx.lineTo(x + w, y + 35); ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawAetherytePass() {
+      const x = 62, y = 52, w = 450, h = 565;
+      drawTape(92, 34, 130, 34, -0.12);
+      drawTape(372, 42, 118, 32, 0.13);
+      drawShadowPaper(x, y, w, h, 22, '#eadfcb', 'rgba(70,55,40,.24)');
+
+      // inner border
+      ctx.save();
+      roundRect(ctx, x + 16, y + 16, w - 32, h - 32, 18);
+      ctx.strokeStyle = 'rgba(101,76,55,.23)';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      ctx.restore();
+
+      ctx.save();
+      ctx.fillStyle = '#3a3027';
+      ctx.font = '900 28px Georgia, "Times New Roman", serif';
+      ctx.fillText('AETHERYTE PASS', x + 30, y + 48);
+      ctx.font = '800 10px system-ui, sans-serif';
+      ctx.fillStyle = 'rgba(65,51,39,.56)';
+      ctx.fillText('UNOFFICIAL FIELD RECORD / ADVENTURER PROFILE', x + 32, y + 68);
+
+      // serial-like decorative marks
+      ctx.strokeStyle = 'rgba(76,127,143,.48)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(x + w - 118, y + 37); ctx.lineTo(x + w - 34, y + 37);
+      ctx.moveTo(x + w - 118, y + 47); ctx.lineTo(x + w - 54, y + 47);
+      ctx.stroke();
+      ctx.restore();
+
+      // photo
+      const p = hitAreas.char;
+      ctx.save();
+      roundRect(ctx, p.x - 10, p.y - 10, p.w + 20, p.h + 20, 16);
+      ctx.fillStyle = '#f8f2e6';
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(70,55,40,.2)';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+      ctx.restore();
+
+      if (!drawImageCover(images.char, p.x, p.y, p.w, p.h, imageState.char, els.charZoom.value)) {
+        drawPlaceholder(p.x, p.y, p.w, p.h, 'CHARACTER SS');
+      }
+      ctx.save();
+      ctx.strokeStyle = 'rgba(255,255,255,.62)';
+      ctx.lineWidth = 6;
+      ctx.strokeRect(p.x + 3, p.y + 3, p.w - 6, p.h - 6);
+      ctx.strokeStyle = 'rgba(60,45,32,.32)';
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(p.x, p.y, p.w, p.h);
+      ctx.restore();
+
+      // profile text
+      const name = value('charName');
+      ctx.save();
+      ctx.fillStyle = 'rgba(72,56,42,.56)';
+      ctx.font = '800 11px system-ui, sans-serif';
+      ctx.fillText('CHARACTER NAME', x + 32, y + 386);
+      if (name) {
+        const size = fitText(name, 360, 33, 16, 900, 'Georgia, serif');
+        ctx.fillStyle = '#2f2a24';
+        ctx.font = `900 ${size}px Georgia, "Times New Roman", serif`;
+        ctx.fillText(name, x + 32, y + 421);
+      } else {
+        ctx.strokeStyle = 'rgba(112,89,61,.26)';
+        ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(x + 32, y + 421); ctx.lineTo(x + 355, y + 421); ctx.stroke();
+      }
+      ctx.restore();
+
+      drawPassField('DATA CENTER', value('dc'), x + 32, y + 456, 145);
+      drawPassField('WORLD', value('world'), x + 205, y + 456, 145);
+      drawPassField('MAIN JOB', value('mainJob'), x + 32, y + 520, 210);
+
+      // small line icon: crystal-ish, not official
+      ctx.save();
+      ctx.translate(x + 272, y + 517);
+      ctx.strokeStyle = 'rgba(76,127,143,.68)';
+      ctx.fillStyle = 'rgba(76,127,143,.12)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(22, 0); ctx.lineTo(42, 20); ctx.lineTo(27, 54); ctx.lineTo(8, 36); ctx.lineTo(12, 12); ctx.closePath();
+      ctx.fill(); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(22, 0); ctx.lineTo(22, 45); ctx.moveTo(12, 12); ctx.lineTo(42, 20); ctx.stroke();
+      ctx.restore();
+
+      if (images.qr) {
+        const qx = x + w - 118, qy = y + h - 118, qs = 76;
+        ctx.save();
+        ctx.fillStyle = '#fffdf9';
+        ctx.fillRect(qx - 7, qy - 7, qs + 14, qs + 26);
+        ctx.strokeStyle = 'rgba(70,55,40,.24)';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(qx - 7, qy - 7, qs + 14, qs + 26);
+        drawImageContain(images.qr, qx, qy, qs, qs);
+        ctx.font = '800 10px system-ui, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillStyle = 'rgba(55,42,32,.66)';
+        ctx.fillText('PROFILE', qx + qs / 2, qy + qs + 14);
+        ctx.restore();
+      }
+    }
+
+    function wrapLinesByChars(text, charsPerLine, maxLines) {
+      const result = [];
+      const rawLines = (text || '').replace(/\r/g, '').split('\n');
+      for (const rawLine of rawLines) {
+        const chars = Array.from(rawLine);
+        if (chars.length === 0) {
+          result.push('');
+        } else {
+          for (let i = 0; i < chars.length; i += charsPerLine) {
+            result.push(chars.slice(i, i + charsPerLine).join(''));
+            if (result.length >= maxLines) return result;
+          }
+        }
+        if (result.length >= maxLines) return result;
+      }
+      return result.slice(0, maxLines);
+    }
+
+    function drawMemo() {
+      const x = 552, y = 58, w = 332, h = 258;
+      drawTape(x + 92, y - 20, 120, 30, .05);
+      drawShadowPaper(x, y, w, h, 14, '#fbf3d9', 'rgba(95,76,54,.22)');
+
+      ctx.save();
+      ctx.fillStyle = 'rgba(72,56,42,.7)';
+      ctx.font = '900 19px Georgia, serif';
+      ctx.fillText('Traveler Memo', x + 24, y + 38);
+      ctx.strokeStyle = 'rgba(154,126,84,.22)';
+      ctx.lineWidth = 1;
+      for (let i = 0; i < 5; i++) {
+        const ly = y + 78 + i * 32;
+        ctx.beginPath(); ctx.moveTo(x + 24, ly + 11); ctx.lineTo(x + w - 24, ly + 11); ctx.stroke();
+      }
+
+      const lines = wrapLinesByChars(els.memo.value, 10, 5);
+      ctx.fillStyle = '#3f342c';
+      ctx.font = '24px "Comic Sans MS", "Hiragino Maru Gothic ProN", "Yu Gothic", cursive';
+      ctx.textBaseline = 'middle';
+      lines.forEach((line, i) => {
+        ctx.fillText(line, x + 28, y + 78 + i * 32);
+      });
+
+      // tiny doodle
+      ctx.strokeStyle = 'rgba(76,127,143,.35)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(x + w - 50, y + h - 38, 18, 0, Math.PI * 2);
+      ctx.moveTo(x + w - 61, y + h - 38); ctx.lineTo(x + w - 39, y + h - 38);
+      ctx.moveTo(x + w - 50, y + h - 49); ctx.lineTo(x + w - 50, y + h - 27);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawReceiptRow(label, text, x, y) {
+      ctx.save();
+      ctx.fillStyle = 'rgba(52,46,40,.7)';
+      ctx.font = '800 12px "Courier New", monospace';
+      ctx.fillText(label, x, y);
+      ctx.fillStyle = '#2f2a24';
+      ctx.font = '900 15px "Courier New", monospace';
+      const safe = text || '—';
+      const size = fitText(safe, 126, 15, 10, 900, '"Courier New", monospace');
+      ctx.font = `900 ${size}px "Courier New", monospace`;
+      ctx.textAlign = 'right';
+      ctx.fillText(safe, x + 188, y);
+      ctx.restore();
+    }
+
+    function drawReceipt() {
+      const x = 914, y = 92, w = 224, h = 254;
+      drawTape(x + 48, y - 24, 120, 30, -.08);
+      ctx.save();
+      ctx.shadowColor = 'rgba(44,35,24,.20)';
+      ctx.shadowBlur = 18;
+      ctx.shadowOffsetY = 12;
+      ctx.fillStyle = '#fff7e8';
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(x + w, y);
+      ctx.lineTo(x + w, y + h - 12);
+      for (let i = 0; i < 10; i++) {
+        const px = x + w - i * (w / 9);
+        ctx.lineTo(px - w / 18, y + h);
+        ctx.lineTo(px - w / 9, y + h - 12);
+      }
+      ctx.closePath();
+      ctx.fill();
+      ctx.shadowColor = 'transparent';
+      ctx.strokeStyle = 'rgba(70,55,40,.2)';
+      ctx.stroke();
+      ctx.restore();
+
+      ctx.save();
+      ctx.fillStyle = '#2f2a24';
+      ctx.font = '900 18px "Courier New", monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText('INN RECEIPT', x + w / 2, y + 35);
+      ctx.font = '800 10px "Courier New", monospace';
+      ctx.fillStyle = 'rgba(52,46,40,.55)';
+      ctx.fillText('ADVENTURER LODGING NOTE', x + w / 2, y + 51);
+      ctx.setLineDash([4, 5]);
+      ctx.strokeStyle = 'rgba(52,46,40,.35)';
+      ctx.beginPath(); ctx.moveTo(x + 18, y + 68); ctx.lineTo(x + w - 18, y + 68); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.restore();
+
+      const active = selectedValues('activeTime').join('/');
+      const lang = selectedValues('language').join('/');
+      drawReceiptRow('ACTIVE', active, x + 18, y + 101);
+      drawReceiptRow('VC', value('vc'), x + 18, y + 135);
+      drawReceiptRow('LANG', lang, x + 18, y + 169);
+
+      ctx.save();
+      ctx.setLineDash([4, 5]);
+      ctx.strokeStyle = 'rgba(52,46,40,.35)';
+      ctx.beginPath(); ctx.moveTo(x + 18, y + 196); ctx.lineTo(x + w - 18, y + 196); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.textAlign = 'center';
+      ctx.font = '800 11px "Courier New", monospace';
+      ctx.fillStyle = 'rgba(52,46,40,.56)';
+      ctx.fillText('THANK YOU FOR PLAYING', x + w / 2, y + 224);
+      ctx.restore();
+    }
+
+    function drawPolaroid(key, x, y, caption, tilt) {
+      const w = 250, h = 190;
+      ctx.save();
+      ctx.translate(x + w / 2, y + h / 2);
+      ctx.rotate(tilt || 0);
+      ctx.translate(-w / 2, -h / 2);
+
+      ctx.shadowColor = 'rgba(44,35,24,.23)';
+      ctx.shadowBlur = 18;
+      ctx.shadowOffsetY = 12;
+      ctx.fillStyle = '#fffaf0';
+      ctx.fillRect(0, 0, w, h);
+      ctx.shadowColor = 'transparent';
+      ctx.strokeStyle = 'rgba(70,55,40,.18)';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(0, 0, w, h);
+
+      const imgX = 16, imgY = 16, imgW = 218, imgH = 122;
+      const area = key === 'photo1' ? hitAreas.photo1 : hitAreas.photo2;
+      const zoom = key === 'photo1' ? els.photo1Zoom.value : els.photo2Zoom.value;
+      if (!drawImageCover(images[key], imgX, imgY, imgW, imgH, imageState[key], zoom)) {
+        drawPlaceholder(imgX, imgY, imgW, imgH, key === 'photo1' ? 'PHOTO 1' : 'PHOTO 2');
+      }
+      ctx.strokeStyle = 'rgba(60,45,32,.24)';
+      ctx.strokeRect(imgX, imgY, imgW, imgH);
+
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#3f342c';
+      ctx.font = '22px "Comic Sans MS", "Hiragino Maru Gothic ProN", "Yu Gothic", cursive';
+      ctx.fillText(caption || '', w / 2, h - 28);
+      ctx.restore();
+
+      // The visual polaroids are tilted, but dragging uses simple unrotated hit areas.
+      void area;
+    }
+
+    function drawCopyright() {
+      ctx.save();
+      ctx.font = '700 12px system-ui, sans-serif';
+      ctx.fillStyle = 'rgba(255,255,255,.72)';
+      ctx.textAlign = 'right';
+      ctx.fillText('© SQUARE ENIX', W - 28, H - 24);
+      ctx.font = '700 10px system-ui, sans-serif';
+      ctx.fillStyle = 'rgba(255,255,255,.50)';
+      ctx.fillText('UNOFFICIAL FAN TOOL', W - 28, H - 42);
+      ctx.restore();
+    }
+
+    function drawTitleStamp() {
+      ctx.save();
+      ctx.translate(548, 30);
+      ctx.rotate(-0.025);
+      ctx.fillStyle = 'rgba(38,31,25,.74)';
+      ctx.font = '900 20px Georgia, serif';
+      ctx.fillText("FFXIV Adventurer's Scrapbook", 0, 0);
+      ctx.font = '800 10px system-ui, sans-serif';
+      ctx.fillStyle = 'rgba(38,31,25,.48)';
+      ctx.fillText('a personal travel record / unofficial', 3, 17);
+      ctx.restore();
+    }
+
+    function drawVignette() {
+      const g = ctx.createRadialGradient(W / 2, H / 2, 260, W / 2, H / 2, 760);
+      g.addColorStop(0, 'rgba(0,0,0,0)');
+      g.addColorStop(1, 'rgba(0,0,0,.22)');
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, W, H);
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, W, H);
+      drawDeskBackground();
+      drawFixedDecorations();
+      drawTitleStamp();
+      drawMemo();
+      drawReceipt();
+      drawPolaroid('photo1', 582, 365, value('caption1'), -0.045);
+      drawPolaroid('photo2', 852, 367, value('caption2'), 0.035);
+      drawAetherytePass();
+      drawVignette();
+      drawCopyright();
+    }
+
+    function pointerToCanvas(evt) {
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = W / rect.width;
+      const scaleY = H / rect.height;
+      return {
+        x: (evt.clientX - rect.left) * scaleX,
+        y: (evt.clientY - rect.top) * scaleY
+      };
+    }
+
+    function hitTest(point) {
+      for (const key of ['char', 'photo1', 'photo2']) {
+        const a = hitAreas[key];
+        if (point.x >= a.x && point.x <= a.x + a.w && point.y >= a.y && point.y <= a.y + a.h) {
+          return images[key] ? key : null;
+        }
+      }
+      return null;
+    }
+
+    canvas.addEventListener('pointerdown', (evt) => {
+      const point = pointerToCanvas(evt);
+      const key = hitTest(point);
+      if (!key) return;
+      dragTarget = key;
+      lastPointer = point;
+      canvas.classList.add('dragging');
+      canvas.setPointerCapture(evt.pointerId);
+    });
+
+    canvas.addEventListener('pointermove', (evt) => {
+      const point = pointerToCanvas(evt);
+      const hover = hitTest(point);
+      canvas.style.cursor = dragTarget ? 'grabbing' : hover ? 'grab' : 'default';
+      if (!dragTarget || !lastPointer) return;
+      const dx = point.x - lastPointer.x;
+      const dy = point.y - lastPointer.y;
+      imageState[dragTarget].offsetX += dx;
+      imageState[dragTarget].offsetY += dy;
+      lastPointer = point;
+      draw();
+    });
+
+    function endDrag(evt) {
+      dragTarget = null;
+      lastPointer = null;
+      canvas.classList.remove('dragging');
+      try { canvas.releasePointerCapture(evt.pointerId); } catch (e) {}
+    }
+
+    canvas.addEventListener('pointerup', endDrag);
+    canvas.addEventListener('pointercancel', endDrag);
+    canvas.addEventListener('pointerleave', () => {
+      if (!dragTarget) canvas.style.cursor = 'default';
+    });
+
+    els.charImage.addEventListener('change', () => loadImageFromInput(els.charImage, 'char'));
+    els.qrImage.addEventListener('change', () => loadImageFromInput(els.qrImage, 'qr'));
+    els.photo1.addEventListener('change', () => loadImageFromInput(els.photo1, 'photo1'));
+    els.photo2.addEventListener('change', () => loadImageFromInput(els.photo2, 'photo2'));
+
+    document.querySelectorAll('[data-clear]').forEach(btn => {
+      btn.addEventListener('click', () => clearImage(btn.dataset.clear));
+    });
+
+    document.querySelectorAll('input[type="text"], input[type="range"], textarea, select, input[type="checkbox"]').forEach(el => {
+      el.addEventListener('input', draw);
+      el.addEventListener('change', draw);
+    });
+
+    els.downloadBtn.addEventListener('click', () => {
+      draw();
+      canvas.toBlob(blob => {
+        if (!blob) return;
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'ffxiv-adventurers-scrapbook.png';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+      }, 'image/png');
+    });
+
+    draw();
+  </script>
+</body>
+</html>
