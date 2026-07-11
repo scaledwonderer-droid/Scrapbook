@@ -68,9 +68,7 @@
       backdrop-filter: blur(8px);
     }
 
-    .panel {
-      padding: 18px;
-    }
+    .panel { padding: 18px; }
 
     .section {
       padding: 14px 0;
@@ -264,7 +262,7 @@
         </div>
 
         <label for="charZoom">キャラクターSSズーム</label>
-        <input id="charZoom" type="range" min="100" max="180" value="112" />
+        <input id="charZoom" type="range" min="100" max="180" value="118" />
         <p class="small-note">Canvas上のキャラクターSS・小写真はドラッグで位置調整できます。</p>
 
         <label for="charName">キャラクター名</label>
@@ -295,7 +293,12 @@
       <div class="section">
         <h2 class="section-title">自由メモ <span class="hint">全角10文字×5行目安</span></h2>
         <label for="memo">メモ</label>
-        <textarea id="memo" maxlength="80" placeholder="例：\n深夜多めです\nSS撮影好き\n零式練習中\nフレ募集中\n気軽にどうぞ"></textarea>
+        <textarea id="memo" maxlength="80" placeholder="例：
+深夜多めです
+SS撮影好き
+零式練習中
+フレ募集中
+気軽にどうぞ"></textarea>
         <p class="small-note">描画時に最大5行まで表示します。1行が長い場合は自動で折り返します。</p>
       </div>
 
@@ -310,6 +313,7 @@
           <label class="check-item"><input type="checkbox" name="activeTime" value="Night" checked />夜</label>
           <label class="check-item"><input type="checkbox" name="activeTime" value="Late" />深夜</label>
         </div>
+        <p class="small-note">3つ以上選ぶと、宿レシートには <strong>Eorzean Resident</strong> と表示します。</p>
 
         <label for="vc">VC可否</label>
         <select id="vc">
@@ -323,6 +327,8 @@
         <div class="check-grid" id="languageBox">
           <label class="check-item"><input type="checkbox" name="language" value="JP" checked />JP</label>
           <label class="check-item"><input type="checkbox" name="language" value="EN" />EN</label>
+          <label class="check-item"><input type="checkbox" name="language" value="DE" />DE</label>
+          <label class="check-item"><input type="checkbox" name="language" value="FR" />FR</label>
           <label class="check-item"><input type="checkbox" name="language" value="CN" />CN</label>
           <label class="check-item"><input type="checkbox" name="language" value="KR" />KR</label>
         </div>
@@ -337,7 +343,7 @@
           <button class="secondary danger" type="button" data-clear="photo1">削除</button>
         </div>
         <label for="photo1Zoom">小写真 1 ズーム</label>
-        <input id="photo1Zoom" type="range" min="100" max="180" value="110" />
+        <input id="photo1Zoom" type="range" min="100" max="180" value="112" />
         <label for="caption1">小写真 1 キャプション</label>
         <input id="caption1" type="text" maxlength="14" placeholder="例：my room" />
 
@@ -347,7 +353,7 @@
           <button class="secondary danger" type="button" data-clear="photo2">削除</button>
         </div>
         <label for="photo2Zoom">小写真 2 ズーム</label>
-        <input id="photo2Zoom" type="range" min="100" max="180" value="110" />
+        <input id="photo2Zoom" type="range" min="100" max="180" value="112" />
         <label for="caption2">小写真 2 キャプション</label>
         <input id="caption2" type="text" maxlength="14" placeholder="例：friends" />
       </div>
@@ -408,9 +414,9 @@
     };
 
     const hitAreas = {
-      char: { x: 92, y: 128, w: 384, h: 282 },
-      photo1: { x: 592, y: 384, w: 218, h: 122 },
-      photo2: { x: 862, y: 386, w: 218, h: 122 }
+      char: { x: 87, y: 124, w: 384, h: 280 },
+      photo1: { x: 563, y: 377, w: 202, h: 202 },
+      photo2: { x: 803, y: 390, w: 202, h: 202 }
     };
 
     let dragTarget = null;
@@ -422,6 +428,17 @@
 
     function selectedValues(name) {
       return Array.from(document.querySelectorAll(`input[name="${name}"]:checked`)).map(el => el.value);
+    }
+
+    function getActiveTimeLabel() {
+      const active = selectedValues('activeTime');
+      if (active.length >= 3) return 'Eorzean Resident';
+      return active.join('/') || '—';
+    }
+
+    function getLanguageLabel() {
+      const langs = selectedValues('language');
+      return langs.join('/') || '—';
     }
 
     function loadImageFromInput(input, key) {
@@ -467,8 +484,8 @@
 
     function drawShadowPaper(x, y, w, h, r, fill, stroke) {
       ctx.save();
-      ctx.shadowColor = 'rgba(44, 35, 24, 0.22)';
-      ctx.shadowBlur = 22;
+      ctx.shadowColor = 'rgba(44, 35, 24, 0.24)';
+      ctx.shadowBlur = 24;
       ctx.shadowOffsetY = 14;
       roundRect(ctx, x, y, w, h, r);
       ctx.fillStyle = fill;
@@ -480,11 +497,20 @@
       ctx.restore();
     }
 
-    function drawTape(x, y, w, h, rot) {
+    function withRotation(x, y, w, h, rot, fn) {
+      ctx.save();
+      ctx.translate(x + w / 2, y + h / 2);
+      ctx.rotate(rot);
+      ctx.translate(-w / 2, -h / 2);
+      fn();
+      ctx.restore();
+    }
+
+    function drawTape(x, y, w, h, rot, tone = 'rgba(236, 222, 185, .72)') {
       ctx.save();
       ctx.translate(x + w / 2, y + h / 2);
       ctx.rotate(rot || 0);
-      ctx.fillStyle = 'rgba(236, 222, 185, .72)';
+      ctx.fillStyle = tone;
       ctx.strokeStyle = 'rgba(129, 110, 76, .18)';
       ctx.lineWidth = 1;
       roundRect(ctx, -w / 2, -h / 2, w, h, 5);
@@ -495,13 +521,13 @@
 
     function drawDeskBackground() {
       const grad = ctx.createLinearGradient(0, 0, W, H);
-      grad.addColorStop(0, '#d9c7ad');
-      grad.addColorStop(.48, '#c8ad8d');
-      grad.addColorStop(1, '#9f7757');
+      grad.addColorStop(0, '#dcc8af');
+      grad.addColorStop(.45, '#c8ab8b');
+      grad.addColorStop(1, '#9d7557');
       ctx.fillStyle = grad;
       ctx.fillRect(0, 0, W, H);
 
-      ctx.globalAlpha = .16;
+      ctx.globalAlpha = .18;
       for (let i = 0; i < 34; i++) {
         const x = (i * 137) % W;
         const y = (i * 91) % H;
@@ -515,75 +541,8 @@
       }
       ctx.globalAlpha = 1;
 
-      ctx.fillStyle = 'rgba(48, 31, 20, .17)';
+      ctx.fillStyle = 'rgba(48, 31, 20, .12)';
       ctx.fillRect(0, 0, W, H);
-    }
-
-    function drawFixedDecorations() {
-      // map fragment
-      ctx.save();
-      ctx.translate(930, 540);
-      ctx.rotate(-0.08);
-      drawShadowPaper(0, 0, 190, 92, 10, '#d8caa8', 'rgba(78,62,43,.22)');
-      ctx.strokeStyle = 'rgba(88, 116, 111, .45)';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(18, 56);
-      ctx.bezierCurveTo(52, 30, 68, 74, 105, 42);
-      ctx.bezierCurveTo(130, 20, 150, 38, 172, 22);
-      ctx.stroke();
-      ctx.strokeStyle = 'rgba(100,73,48,.28)';
-      ctx.lineWidth = 1;
-      for (let x = 30; x < 180; x += 34) {
-        ctx.beginPath(); ctx.moveTo(x, 12); ctx.lineTo(x - 18, 82); ctx.stroke();
-      }
-      ctx.fillStyle = 'rgba(104,70,45,.35)';
-      ctx.beginPath(); ctx.arc(82, 50, 5, 0, Math.PI * 2); ctx.fill();
-      ctx.restore();
-
-      // compass coin
-      ctx.save();
-      ctx.translate(1095, 82);
-      ctx.rotate(.16);
-      ctx.shadowColor = 'rgba(44,35,24,.2)';
-      ctx.shadowBlur = 12;
-      ctx.fillStyle = '#c59c64';
-      ctx.beginPath(); ctx.arc(0, 0, 44, 0, Math.PI * 2); ctx.fill();
-      ctx.shadowColor = 'transparent';
-      ctx.strokeStyle = 'rgba(55,42,32,.38)';
-      ctx.lineWidth = 3;
-      ctx.beginPath(); ctx.arc(0, 0, 34, 0, Math.PI * 2); ctx.stroke();
-      ctx.strokeStyle = 'rgba(55,42,32,.55)';
-      ctx.lineWidth = 2;
-      ctx.beginPath(); ctx.moveTo(0, -28); ctx.lineTo(8, 0); ctx.lineTo(0, 28); ctx.lineTo(-8, 0); ctx.closePath(); ctx.stroke();
-      ctx.font = '700 12px Georgia, serif';
-      ctx.textAlign = 'center';
-      ctx.fillStyle = 'rgba(55,42,32,.62)';
-      ctx.fillText('N', 0, -18);
-      ctx.restore();
-
-      // pressed leaf line art
-      ctx.save();
-      ctx.translate(520, 584);
-      ctx.rotate(.18);
-      ctx.strokeStyle = 'rgba(44, 96, 72, .48)';
-      ctx.lineWidth = 2;
-      ctx.beginPath(); ctx.moveTo(0, 58); ctx.quadraticCurveTo(24, 22, 64, 0); ctx.stroke();
-      for (let i = 0; i < 6; i++) {
-        const t = i * 10 + 8;
-        ctx.beginPath(); ctx.moveTo(t, 46 - i * 7); ctx.quadraticCurveTo(t - 22, 35 - i * 6, t - 8, 18 - i * 3); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(t + 5, 42 - i * 7); ctx.quadraticCurveTo(t + 24, 28 - i * 6, t + 18, 12 - i * 3); ctx.stroke();
-      }
-      ctx.restore();
-
-      // loose string
-      ctx.strokeStyle = 'rgba(68,48,34,.24)';
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.moveTo(30, 635);
-      ctx.bezierCurveTo(200, 590, 320, 685, 480, 615);
-      ctx.bezierCurveTo(570, 575, 610, 630, 680, 605);
-      ctx.stroke();
     }
 
     function drawImageCover(img, x, y, w, h, state, zoomValue) {
@@ -611,7 +570,9 @@
       const dx = x + (w - dw) / 2;
       const dy = y + (h - dh) / 2;
       ctx.save();
-      ctx.beginPath(); ctx.rect(x, y, w, h); ctx.clip();
+      ctx.beginPath();
+      ctx.rect(x, y, w, h);
+      ctx.clip();
       ctx.drawImage(img, dx, dy, dw, dh);
       ctx.restore();
       return true;
@@ -635,7 +596,9 @@
       ctx.lineTo(x + 25, y + h - 24);
       ctx.closePath();
       ctx.stroke();
-      ctx.beginPath(); ctx.arc(x + w - 62, y + 48, 18, 0, Math.PI * 2); ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(x + w - 62, y + 48, 18, 0, Math.PI * 2);
+      ctx.stroke();
       ctx.font = '800 18px system-ui, sans-serif';
       ctx.textAlign = 'center';
       ctx.fillStyle = 'rgba(255,255,255,.78)';
@@ -658,7 +621,6 @@
       ctx.save();
       ctx.fillStyle = 'rgba(80,64,48,.54)';
       ctx.font = '800 11px system-ui, sans-serif';
-      ctx.letterSpacing = '0.06em';
       ctx.fillText(label, x, y);
       ctx.fillStyle = '#2f2a24';
       const size = fitText(text || '—', w, 22, 12, 800);
@@ -666,113 +628,227 @@
       ctx.fillText(text || '—', x, y + 25);
       ctx.strokeStyle = 'rgba(112,89,61,.26)';
       ctx.lineWidth = 1;
-      ctx.beginPath(); ctx.moveTo(x, y + 35); ctx.lineTo(x + w, y + 35); ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(x, y + 35);
+      ctx.lineTo(x + w, y + 35);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawUnderPaper(x, y, w, h, rot, fill = '#d8ccb3') {
+      withRotation(x, y, w, h, rot, () => {
+        drawShadowPaper(0, 0, w, h, 10, fill, 'rgba(70,55,40,.14)');
+        ctx.save();
+        ctx.strokeStyle = 'rgba(120,94,68,.18)';
+        for (let i = 18; i < w; i += 28) {
+          ctx.beginPath();
+          ctx.moveTo(i, 12);
+          ctx.lineTo(i - 8, h - 14);
+          ctx.stroke();
+        }
+        ctx.restore();
+      });
+    }
+
+    function drawFixedDecorations() {
+      drawUnderPaper(635, 49, 116, 48, -0.12, '#d8ccab');
+      drawUnderPaper(1006, 62, 88, 38, 0.08, '#d3c7aa');
+      drawUnderPaper(968, 508, 178, 112, -0.10, '#d8caa8');
+
+      ctx.save();
+      ctx.translate(1092, 86);
+      ctx.rotate(.16);
+      ctx.shadowColor = 'rgba(44,35,24,.2)';
+      ctx.shadowBlur = 12;
+      ctx.fillStyle = '#c59c64';
+      ctx.beginPath();
+      ctx.arc(0, 0, 44, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.shadowColor = 'transparent';
+      ctx.strokeStyle = 'rgba(55,42,32,.38)';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.arc(0, 0, 34, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.strokeStyle = 'rgba(55,42,32,.55)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(0, -28);
+      ctx.lineTo(8, 0);
+      ctx.lineTo(0, 28);
+      ctx.lineTo(-8, 0);
+      ctx.closePath();
+      ctx.stroke();
+      ctx.font = '700 12px Georgia, serif';
+      ctx.textAlign = 'center';
+      ctx.fillStyle = 'rgba(55,42,32,.62)';
+      ctx.fillText('N', 0, -18);
+      ctx.restore();
+
+      ctx.save();
+      ctx.translate(520, 582);
+      ctx.rotate(.18);
+      ctx.strokeStyle = 'rgba(44, 96, 72, .48)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(0, 58);
+      ctx.quadraticCurveTo(24, 22, 64, 0);
+      ctx.stroke();
+      for (let i = 0; i < 6; i++) {
+        const t = i * 10 + 8;
+        ctx.beginPath();
+        ctx.moveTo(t, 46 - i * 7);
+        ctx.quadraticCurveTo(t - 22, 35 - i * 6, t - 8, 18 - i * 3);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(t + 5, 42 - i * 7);
+        ctx.quadraticCurveTo(t + 24, 28 - i * 6, t + 18, 12 - i * 3);
+        ctx.stroke();
+      }
+      ctx.restore();
+
+      ctx.strokeStyle = 'rgba(68,48,34,.24)';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(30, 635);
+      ctx.bezierCurveTo(180, 600, 310, 684, 470, 618);
+      ctx.bezierCurveTo(560, 582, 634, 628, 714, 600);
+      ctx.bezierCurveTo(782, 577, 866, 622, 928, 598);
+      ctx.stroke();
+
+      ctx.save();
+      ctx.translate(1018, 566);
+      ctx.rotate(-0.12);
+      ctx.strokeStyle = 'rgba(76,127,143,.36)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(0, 0, 18, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(-56, 10);
+      ctx.quadraticCurveTo(-16, -14, 12, 8);
+      ctx.quadraticCurveTo(36, 26, 70, 2);
+      ctx.stroke();
+      ctx.restore();
+
+      ctx.save();
+      ctx.translate(103, 78);
+      ctx.rotate(-0.18);
+      ctx.strokeStyle = 'rgba(129,97,68,.24)';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(0, 0, 118, 26);
+      ctx.font = '700 11px "Courier New", monospace';
+      ctx.fillStyle = 'rgba(76,58,43,.42)';
+      ctx.fillText('TRAVEL NOTE', 13, 17);
       ctx.restore();
     }
 
     function drawAetherytePass() {
-      const x = 62, y = 52, w = 450, h = 565;
-      drawTape(92, 34, 130, 34, -0.12);
-      drawTape(372, 42, 118, 32, 0.13);
-      drawShadowPaper(x, y, w, h, 22, '#eadfcb', 'rgba(70,55,40,.24)');
+      const outerX = 58, outerY = 56, outerW = 448, outerH = 558;
+      drawTape(100, 35, 128, 36, -0.13);
+      drawTape(374, 45, 120, 32, 0.12);
+      withRotation(outerX, outerY, outerW, outerH, -0.022, () => {
+        drawShadowPaper(0, 0, outerW, outerH, 22, '#eadfcb', 'rgba(70,55,40,.24)');
 
-      // inner border
-      ctx.save();
-      roundRect(ctx, x + 16, y + 16, w - 32, h - 32, 18);
-      ctx.strokeStyle = 'rgba(101,76,55,.23)';
-      ctx.lineWidth = 2;
-      ctx.stroke();
-      ctx.restore();
+        roundRect(ctx, 16, 16, outerW - 32, outerH - 32, 18);
+        ctx.strokeStyle = 'rgba(101,76,55,.23)';
+        ctx.lineWidth = 2;
+        ctx.stroke();
 
-      ctx.save();
-      ctx.fillStyle = '#3a3027';
-      ctx.font = '900 28px Georgia, "Times New Roman", serif';
-      ctx.fillText('AETHERYTE PASS', x + 30, y + 48);
-      ctx.font = '800 10px system-ui, sans-serif';
-      ctx.fillStyle = 'rgba(65,51,39,.56)';
-      ctx.fillText('UNOFFICIAL FIELD RECORD / ADVENTURER PROFILE', x + 32, y + 68);
-
-      // serial-like decorative marks
-      ctx.strokeStyle = 'rgba(76,127,143,.48)';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(x + w - 118, y + 37); ctx.lineTo(x + w - 34, y + 37);
-      ctx.moveTo(x + w - 118, y + 47); ctx.lineTo(x + w - 54, y + 47);
-      ctx.stroke();
-      ctx.restore();
-
-      // photo
-      const p = hitAreas.char;
-      ctx.save();
-      roundRect(ctx, p.x - 10, p.y - 10, p.w + 20, p.h + 20, 16);
-      ctx.fillStyle = '#f8f2e6';
-      ctx.fill();
-      ctx.strokeStyle = 'rgba(70,55,40,.2)';
-      ctx.lineWidth = 1.5;
-      ctx.stroke();
-      ctx.restore();
-
-      if (!drawImageCover(images.char, p.x, p.y, p.w, p.h, imageState.char, els.charZoom.value)) {
-        drawPlaceholder(p.x, p.y, p.w, p.h, 'CHARACTER SS');
-      }
-      ctx.save();
-      ctx.strokeStyle = 'rgba(255,255,255,.62)';
-      ctx.lineWidth = 6;
-      ctx.strokeRect(p.x + 3, p.y + 3, p.w - 6, p.h - 6);
-      ctx.strokeStyle = 'rgba(60,45,32,.32)';
-      ctx.lineWidth = 1.5;
-      ctx.strokeRect(p.x, p.y, p.w, p.h);
-      ctx.restore();
-
-      // profile text
-      const name = value('charName');
-      ctx.save();
-      ctx.fillStyle = 'rgba(72,56,42,.56)';
-      ctx.font = '800 11px system-ui, sans-serif';
-      ctx.fillText('CHARACTER NAME', x + 32, y + 386);
-      if (name) {
-        const size = fitText(name, 360, 33, 16, 900, 'Georgia, serif');
-        ctx.fillStyle = '#2f2a24';
-        ctx.font = `900 ${size}px Georgia, "Times New Roman", serif`;
-        ctx.fillText(name, x + 32, y + 421);
-      } else {
-        ctx.strokeStyle = 'rgba(112,89,61,.26)';
-        ctx.lineWidth = 1;
-        ctx.beginPath(); ctx.moveTo(x + 32, y + 421); ctx.lineTo(x + 355, y + 421); ctx.stroke();
-      }
-      ctx.restore();
-
-      drawPassField('DATA CENTER', value('dc'), x + 32, y + 456, 145);
-      drawPassField('WORLD', value('world'), x + 205, y + 456, 145);
-      drawPassField('MAIN JOB', value('mainJob'), x + 32, y + 520, 210);
-
-      // small line icon: crystal-ish, not official
-      ctx.save();
-      ctx.translate(x + 272, y + 517);
-      ctx.strokeStyle = 'rgba(76,127,143,.68)';
-      ctx.fillStyle = 'rgba(76,127,143,.12)';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(22, 0); ctx.lineTo(42, 20); ctx.lineTo(27, 54); ctx.lineTo(8, 36); ctx.lineTo(12, 12); ctx.closePath();
-      ctx.fill(); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(22, 0); ctx.lineTo(22, 45); ctx.moveTo(12, 12); ctx.lineTo(42, 20); ctx.stroke();
-      ctx.restore();
-
-      if (images.qr) {
-        const qx = x + w - 118, qy = y + h - 118, qs = 76;
-        ctx.save();
-        ctx.fillStyle = '#fffdf9';
-        ctx.fillRect(qx - 7, qy - 7, qs + 14, qs + 26);
-        ctx.strokeStyle = 'rgba(70,55,40,.24)';
-        ctx.lineWidth = 1;
-        ctx.strokeRect(qx - 7, qy - 7, qs + 14, qs + 26);
-        drawImageContain(images.qr, qx, qy, qs, qs);
+        ctx.fillStyle = '#3a3027';
+        ctx.font = '900 28px Georgia, "Times New Roman", serif';
+        ctx.fillText('AETHERYTE PASS', 30, 48);
         ctx.font = '800 10px system-ui, sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillStyle = 'rgba(55,42,32,.66)';
-        ctx.fillText('PROFILE', qx + qs / 2, qy + qs + 14);
+        ctx.fillStyle = 'rgba(65,51,39,.56)';
+        ctx.fillText('UNOFFICIAL FIELD RECORD / ADVENTURER PROFILE', 32, 68);
+
+        ctx.strokeStyle = 'rgba(76,127,143,.48)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(outerW - 118, 37);
+        ctx.lineTo(outerW - 34, 37);
+        ctx.moveTo(outerW - 118, 47);
+        ctx.lineTo(outerW - 54, 47);
+        ctx.stroke();
+
+        const p = { x: 28, y: 74, w: 384, h: 280 };
+        roundRect(ctx, p.x - 10, p.y - 10, p.w + 20, p.h + 20, 16);
+        ctx.fillStyle = '#f8f2e6';
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(70,55,40,.2)';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        if (!drawImageCover(images.char, p.x, p.y, p.w, p.h, imageState.char, els.charZoom.value)) {
+          drawPlaceholder(p.x, p.y, p.w, p.h, 'CHARACTER SS');
+        }
+        ctx.strokeStyle = 'rgba(255,255,255,.62)';
+        ctx.lineWidth = 6;
+        ctx.strokeRect(p.x + 3, p.y + 3, p.w - 6, p.h - 6);
+        ctx.strokeStyle = 'rgba(60,45,32,.32)';
+        ctx.lineWidth = 1.5;
+        ctx.strokeRect(p.x, p.y, p.w, p.h);
+
+        const name = value('charName');
+        ctx.fillStyle = 'rgba(72,56,42,.56)';
+        ctx.font = '800 11px system-ui, sans-serif';
+        ctx.fillText('CHARACTER NAME', 32, 392);
+        if (name) {
+          const size = fitText(name, 360, 33, 16, 900, 'Georgia, serif');
+          ctx.fillStyle = '#2f2a24';
+          ctx.font = `900 ${size}px Georgia, "Times New Roman", serif`;
+          ctx.fillText(name, 32, 427);
+        } else {
+          ctx.strokeStyle = 'rgba(112,89,61,.26)';
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(32, 427);
+          ctx.lineTo(355, 427);
+          ctx.stroke();
+        }
+
+        drawPassField('DATA CENTER', value('dc'), 32, 462, 145);
+        drawPassField('WORLD', value('world'), 205, 462, 145);
+        drawPassField('MAIN JOB', value('mainJob'), 32, 522, 210);
+
+        ctx.save();
+        ctx.translate(272, 519);
+        ctx.strokeStyle = 'rgba(76,127,143,.68)';
+        ctx.fillStyle = 'rgba(76,127,143,.12)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(22, 0);
+        ctx.lineTo(42, 20);
+        ctx.lineTo(27, 54);
+        ctx.lineTo(8, 36);
+        ctx.lineTo(12, 12);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(22, 0);
+        ctx.lineTo(22, 45);
+        ctx.moveTo(12, 12);
+        ctx.lineTo(42, 20);
+        ctx.stroke();
         ctx.restore();
-      }
+
+        if (images.qr) {
+          const qx = outerW - 118;
+          const qy = outerH - 118;
+          const qs = 76;
+          ctx.fillStyle = '#fffdf9';
+          ctx.fillRect(qx - 7, qy - 7, qs + 14, qs + 26);
+          ctx.strokeStyle = 'rgba(70,55,40,.24)';
+          ctx.lineWidth = 1;
+          ctx.strokeRect(qx - 7, qy - 7, qs + 14, qs + 26);
+          drawImageContain(images.qr, qx, qy, qs, qs);
+          ctx.font = '800 10px system-ui, sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillStyle = 'rgba(55,42,32,.66)';
+          ctx.fillText('PROFILE', qx + qs / 2, qy + qs + 14);
+        }
+      });
     }
 
     function wrapLinesByChars(text, charsPerLine, maxLines) {
@@ -794,49 +870,54 @@
     }
 
     function drawMemo() {
-      const x = 552, y = 58, w = 332, h = 258;
-      drawTape(x + 92, y - 20, 120, 30, .05);
-      drawShadowPaper(x, y, w, h, 14, '#fbf3d9', 'rgba(95,76,54,.22)');
+      const x = 536, y = 64, w = 294, h = 212;
+      drawTape(x + 58, y - 16, 100, 28, 0.04, 'rgba(236, 222, 185, .78)');
+      drawTape(x + 205, y - 14, 88, 26, -0.08, 'rgba(214, 204, 170, .64)');
+      withRotation(x, y, w, h, 0.024, () => {
+        drawShadowPaper(0, 0, w, h, 14, '#fbf3d9', 'rgba(95,76,54,.22)');
 
-      ctx.save();
-      ctx.fillStyle = 'rgba(72,56,42,.7)';
-      ctx.font = '900 19px Georgia, serif';
-      ctx.fillText('Traveler Memo', x + 24, y + 38);
-      ctx.strokeStyle = 'rgba(154,126,84,.22)';
-      ctx.lineWidth = 1;
-      for (let i = 0; i < 5; i++) {
-        const ly = y + 78 + i * 32;
-        ctx.beginPath(); ctx.moveTo(x + 24, ly + 11); ctx.lineTo(x + w - 24, ly + 11); ctx.stroke();
-      }
+        ctx.fillStyle = 'rgba(72,56,42,.7)';
+        ctx.font = '900 18px Georgia, serif';
+        ctx.fillText('Traveler Memo', 22, 34);
+        ctx.strokeStyle = 'rgba(154,126,84,.22)';
+        ctx.lineWidth = 1;
+        for (let i = 0; i < 5; i++) {
+          const ly = 62 + i * 29;
+          ctx.beginPath();
+          ctx.moveTo(20, ly + 12);
+          ctx.lineTo(w - 20, ly + 12);
+          ctx.stroke();
+        }
 
-      const lines = wrapLinesByChars(els.memo.value, 10, 5);
-      ctx.fillStyle = '#3f342c';
-      ctx.font = '24px "Comic Sans MS", "Hiragino Maru Gothic ProN", "Yu Gothic", cursive';
-      ctx.textBaseline = 'middle';
-      lines.forEach((line, i) => {
-        ctx.fillText(line, x + 28, y + 78 + i * 32);
+        const lines = wrapLinesByChars(els.memo.value, 10, 5);
+        ctx.fillStyle = '#3f342c';
+        ctx.font = '23px "Comic Sans MS", "Hiragino Maru Gothic ProN", "Yu Gothic", cursive';
+        ctx.textBaseline = 'middle';
+        lines.forEach((line, i) => {
+          ctx.fillText(line, 25, 72 + i * 29);
+        });
+
+        ctx.strokeStyle = 'rgba(76,127,143,.35)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(w - 40, h - 32, 15, 0, Math.PI * 2);
+        ctx.moveTo(w - 49, h - 32);
+        ctx.lineTo(w - 31, h - 32);
+        ctx.moveTo(w - 40, h - 41);
+        ctx.lineTo(w - 40, h - 23);
+        ctx.stroke();
       });
-
-      // tiny doodle
-      ctx.strokeStyle = 'rgba(76,127,143,.35)';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.arc(x + w - 50, y + h - 38, 18, 0, Math.PI * 2);
-      ctx.moveTo(x + w - 61, y + h - 38); ctx.lineTo(x + w - 39, y + h - 38);
-      ctx.moveTo(x + w - 50, y + h - 49); ctx.lineTo(x + w - 50, y + h - 27);
-      ctx.stroke();
-      ctx.restore();
     }
 
     function drawReceiptRow(label, text, x, y) {
       ctx.save();
       ctx.fillStyle = 'rgba(52,46,40,.7)';
       ctx.font = '800 12px "Courier New", monospace';
+      ctx.textAlign = 'left';
       ctx.fillText(label, x, y);
       ctx.fillStyle = '#2f2a24';
-      ctx.font = '900 15px "Courier New", monospace';
       const safe = text || '—';
-      const size = fitText(safe, 126, 15, 10, 900, '"Courier New", monospace');
+      const size = fitText(safe, 128, 15, 9, 900, '"Courier New", monospace');
       ctx.font = `900 ${size}px "Courier New", monospace`;
       ctx.textAlign = 'right';
       ctx.fillText(safe, x + 188, y);
@@ -844,113 +925,115 @@
     }
 
     function drawReceipt() {
-      const x = 914, y = 92, w = 224, h = 254;
-      drawTape(x + 48, y - 24, 120, 30, -.08);
-      ctx.save();
-      ctx.shadowColor = 'rgba(44,35,24,.20)';
-      ctx.shadowBlur = 18;
-      ctx.shadowOffsetY = 12;
-      ctx.fillStyle = '#fff7e8';
-      ctx.beginPath();
-      ctx.moveTo(x, y);
-      ctx.lineTo(x + w, y);
-      ctx.lineTo(x + w, y + h - 12);
-      for (let i = 0; i < 10; i++) {
-        const px = x + w - i * (w / 9);
-        ctx.lineTo(px - w / 18, y + h);
-        ctx.lineTo(px - w / 9, y + h - 12);
-      }
-      ctx.closePath();
-      ctx.fill();
-      ctx.shadowColor = 'transparent';
-      ctx.strokeStyle = 'rgba(70,55,40,.2)';
-      ctx.stroke();
-      ctx.restore();
+      const x = 898, y = 88, w = 226, h = 254;
+      drawTape(x + 52, y - 20, 116, 28, -0.10);
+      withRotation(x, y, w, h, -0.052, () => {
+        ctx.save();
+        ctx.shadowColor = 'rgba(44,35,24,.20)';
+        ctx.shadowBlur = 18;
+        ctx.shadowOffsetY = 12;
+        ctx.fillStyle = '#fff7e8';
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(w, 0);
+        ctx.lineTo(w, h - 12);
+        for (let i = 0; i < 10; i++) {
+          const px = w - i * (w / 9);
+          ctx.lineTo(px - w / 18, h);
+          ctx.lineTo(px - w / 9, h - 12);
+        }
+        ctx.closePath();
+        ctx.fill();
+        ctx.shadowColor = 'transparent';
+        ctx.strokeStyle = 'rgba(70,55,40,.2)';
+        ctx.stroke();
+        ctx.restore();
 
-      ctx.save();
-      ctx.fillStyle = '#2f2a24';
-      ctx.font = '900 18px "Courier New", monospace';
-      ctx.textAlign = 'center';
-      ctx.fillText('INN RECEIPT', x + w / 2, y + 35);
-      ctx.font = '800 10px "Courier New", monospace';
-      ctx.fillStyle = 'rgba(52,46,40,.55)';
-      ctx.fillText('ADVENTURER LODGING NOTE', x + w / 2, y + 51);
-      ctx.setLineDash([4, 5]);
-      ctx.strokeStyle = 'rgba(52,46,40,.35)';
-      ctx.beginPath(); ctx.moveTo(x + 18, y + 68); ctx.lineTo(x + w - 18, y + 68); ctx.stroke();
-      ctx.setLineDash([]);
-      ctx.restore();
+        ctx.fillStyle = '#2f2a24';
+        ctx.font = '900 18px "Courier New", monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText('INN RECEIPT', w / 2, 35);
+        ctx.font = '800 10px "Courier New", monospace';
+        ctx.fillStyle = 'rgba(52,46,40,.55)';
+        ctx.fillText('ADVENTURER LODGING NOTE', w / 2, 51);
+        ctx.setLineDash([4, 5]);
+        ctx.strokeStyle = 'rgba(52,46,40,.35)';
+        ctx.beginPath();
+        ctx.moveTo(18, 68);
+        ctx.lineTo(w - 18, 68);
+        ctx.stroke();
+        ctx.setLineDash([]);
 
-      const active = selectedValues('activeTime').join('/');
-      const lang = selectedValues('language').join('/');
-      drawReceiptRow('ACTIVE', active, x + 18, y + 101);
-      drawReceiptRow('VC', value('vc'), x + 18, y + 135);
-      drawReceiptRow('LANG', lang, x + 18, y + 169);
+        drawReceiptRow('ACTIVE', getActiveTimeLabel(), 18, 101);
+        drawReceiptRow('VC', value('vc'), 18, 135);
+        drawReceiptRow('LANG', getLanguageLabel(), 18, 169);
 
-      ctx.save();
-      ctx.setLineDash([4, 5]);
-      ctx.strokeStyle = 'rgba(52,46,40,.35)';
-      ctx.beginPath(); ctx.moveTo(x + 18, y + 196); ctx.lineTo(x + w - 18, y + 196); ctx.stroke();
-      ctx.setLineDash([]);
-      ctx.textAlign = 'center';
-      ctx.font = '800 11px "Courier New", monospace';
-      ctx.fillStyle = 'rgba(52,46,40,.56)';
-      ctx.fillText('THANK YOU FOR PLAYING', x + w / 2, y + 224);
-      ctx.restore();
+        ctx.setLineDash([4, 5]);
+        ctx.strokeStyle = 'rgba(52,46,40,.35)';
+        ctx.beginPath();
+        ctx.moveTo(18, 196);
+        ctx.lineTo(w - 18, 196);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.textAlign = 'center';
+        ctx.font = '800 11px "Courier New", monospace';
+        ctx.fillStyle = 'rgba(52,46,40,.56)';
+        ctx.fillText('THANK YOU FOR PLAYING', w / 2, 224);
+      });
+    }
+
+    function drawPhotoUnderlay(x, y, w, h, rot) {
+      withRotation(x, y, w, h, rot, () => {
+        drawShadowPaper(0, 0, w, h, 8, '#d9cdb6', 'rgba(70,55,40,.12)');
+      });
     }
 
     function drawPolaroid(key, x, y, caption, tilt) {
-      const w = 250, h = 190;
-      ctx.save();
-      ctx.translate(x + w / 2, y + h / 2);
-      ctx.rotate(tilt || 0);
-      ctx.translate(-w / 2, -h / 2);
+      const w = 242, h = 244;
+      const imgX = 20, imgY = 18, imgW = 202, imgH = 202;
+      drawTape(x + 34, y - 10, 78, 24, tilt - 0.05);
+      drawTape(x + 154, y - 7, 70, 22, tilt + 0.05, 'rgba(216, 207, 177, .62)');
+      withRotation(x, y, w, h, tilt || 0, () => {
+        ctx.shadowColor = 'rgba(44,35,24,.24)';
+        ctx.shadowBlur = 18;
+        ctx.shadowOffsetY = 12;
+        ctx.fillStyle = '#fffaf0';
+        ctx.fillRect(0, 0, w, h);
+        ctx.shadowColor = 'transparent';
+        ctx.strokeStyle = 'rgba(70,55,40,.18)';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(0, 0, w, h);
 
-      ctx.shadowColor = 'rgba(44,35,24,.23)';
-      ctx.shadowBlur = 18;
-      ctx.shadowOffsetY = 12;
-      ctx.fillStyle = '#fffaf0';
-      ctx.fillRect(0, 0, w, h);
-      ctx.shadowColor = 'transparent';
-      ctx.strokeStyle = 'rgba(70,55,40,.18)';
-      ctx.lineWidth = 1;
-      ctx.strokeRect(0, 0, w, h);
+        if (!drawImageCover(images[key], imgX, imgY, imgW, imgH, imageState[key], key === 'photo1' ? els.photo1Zoom.value : els.photo2Zoom.value)) {
+          drawPlaceholder(imgX, imgY, imgW, imgH, key === 'photo1' ? 'PHOTO 1' : 'PHOTO 2');
+        }
 
-      const imgX = 16, imgY = 16, imgW = 218, imgH = 122;
-      const area = key === 'photo1' ? hitAreas.photo1 : hitAreas.photo2;
-      const zoom = key === 'photo1' ? els.photo1Zoom.value : els.photo2Zoom.value;
-      if (!drawImageCover(images[key], imgX, imgY, imgW, imgH, imageState[key], zoom)) {
-        drawPlaceholder(imgX, imgY, imgW, imgH, key === 'photo1' ? 'PHOTO 1' : 'PHOTO 2');
-      }
-      ctx.strokeStyle = 'rgba(60,45,32,.24)';
-      ctx.strokeRect(imgX, imgY, imgW, imgH);
+        ctx.strokeStyle = 'rgba(60,45,32,.24)';
+        ctx.strokeRect(imgX, imgY, imgW, imgH);
 
-      ctx.textAlign = 'center';
-      ctx.fillStyle = '#3f342c';
-      ctx.font = '22px "Comic Sans MS", "Hiragino Maru Gothic ProN", "Yu Gothic", cursive';
-      ctx.fillText(caption || '', w / 2, h - 28);
-      ctx.restore();
-
-      // The visual polaroids are tilted, but dragging uses simple unrotated hit areas.
-      void area;
+        ctx.textAlign = 'center';
+        ctx.fillStyle = '#3f342c';
+        ctx.font = '22px "Comic Sans MS", "Hiragino Maru Gothic ProN", "Yu Gothic", cursive';
+        ctx.fillText(caption || '', w / 2, h - 18);
+      });
     }
 
     function drawCopyright() {
       ctx.save();
       ctx.font = '700 12px system-ui, sans-serif';
-      ctx.fillStyle = 'rgba(255,255,255,.72)';
+      ctx.fillStyle = 'rgba(255,255,255,.78)';
       ctx.textAlign = 'right';
       ctx.fillText('© SQUARE ENIX', W - 28, H - 24);
       ctx.font = '700 10px system-ui, sans-serif';
-      ctx.fillStyle = 'rgba(255,255,255,.50)';
+      ctx.fillStyle = 'rgba(255,255,255,.54)';
       ctx.fillText('UNOFFICIAL FAN TOOL', W - 28, H - 42);
       ctx.restore();
     }
 
     function drawTitleStamp() {
       ctx.save();
-      ctx.translate(548, 30);
-      ctx.rotate(-0.025);
+      ctx.translate(560, 28);
+      ctx.rotate(-0.018);
       ctx.fillStyle = 'rgba(38,31,25,.74)';
       ctx.font = '900 20px Georgia, serif';
       ctx.fillText("FFXIV Adventurer's Scrapbook", 0, 0);
@@ -963,7 +1046,7 @@
     function drawVignette() {
       const g = ctx.createRadialGradient(W / 2, H / 2, 260, W / 2, H / 2, 760);
       g.addColorStop(0, 'rgba(0,0,0,0)');
-      g.addColorStop(1, 'rgba(0,0,0,.22)');
+      g.addColorStop(1, 'rgba(0,0,0,.18)');
       ctx.fillStyle = g;
       ctx.fillRect(0, 0, W, H);
     }
@@ -975,8 +1058,10 @@
       drawTitleStamp();
       drawMemo();
       drawReceipt();
-      drawPolaroid('photo1', 582, 365, value('caption1'), -0.045);
-      drawPolaroid('photo2', 852, 367, value('caption2'), 0.035);
+      drawPhotoUnderlay(586, 372, 210, 220, -0.08);
+      drawPhotoUnderlay(825, 388, 210, 220, 0.075);
+      drawPolaroid('photo1', 576, 362, value('caption1'), -0.065);
+      drawPolaroid('photo2', 814, 374, value('caption2'), 0.055);
       drawAetherytePass();
       drawVignette();
       drawCopyright();
