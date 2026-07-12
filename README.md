@@ -23,16 +23,6 @@
 3. プレビュー上で画像の位置やズームを調整します。
 4. 「PNG保存」から完成画像を保存します。
 
-## ファイル構成
-
-```text
-README.md
-index.html
-scrapbook_base_back.png
-```
-
-`index.html` と `scrapbook_base_back.png` は同じ階層に配置してください。
-
 ## 制作者表記
 
 本作の企画・デザイン・制作は **鱗の旅人** によるものです。
