@@ -1,6 +1,6 @@
 # FFXIV Adventurer's Scrapbook
 
-旅人の机の上に写真やメモ、旅券、宿のレシートを広げたような、スクラップブック風のFFXIV向けプロフィール画像を作成できる非公式ファンツールです。
+旅人の机の上に写真やメモ、旅券、宿のレシートを広げたような、スクラップブック風のFFXIV向けプロフィール画像を作成できます。
 
 - 公開ページ：https://scaledwonderer-droid.github.io/Scrapbook/
 - 元リポジトリ：https://github.com/scaledwonderer-droid/Scrapbook
