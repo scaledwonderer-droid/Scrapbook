@@ -1,0 +1,2261 @@
+<!--
+  FFXIV Adventurer's Scrapbook
+  Created by 鱗の旅人
+  Original repository: https://github.com/scaledwonderer-droid/Scrapbook
+  First published: 2026
+-->
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FFXIV Adventurer's Scrapbook</title>
+  <style>
+    @font-face {
+      font-family: "ScrapDancingScript";
+      src: url("./fonts/DancingScript.ttf") format("truetype");
+      font-style: normal;
+      font-weight: 400 700;
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: "ScrapKleeOne";
+      src: url("./fonts/KleeOne-Regular.ttf") format("truetype");
+      font-style: normal;
+      font-weight: 400;
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: "ScrapZenKurenaido";
+      src: url("./fonts/ZenKurenaido-Regular.ttf") format("truetype");
+      font-style: normal;
+      font-weight: 400;
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: "ScrapZenMaruGothic";
+      src: url("./fonts/ZenMaruGothic-Regular.ttf") format("truetype");
+      font-style: normal;
+      font-weight: 400;
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: "ScrapHachiMaruPop";
+      src: url("./fonts/HachiMaruPop-Regular.ttf") format("truetype");
+      font-style: normal;
+      font-weight: 400;
+      font-display: swap;
+    }
+
+    :root {
+      --bg: #f3efe7;
+      --panel: #ffffff;
+      --ink: #2f2a24;
+      --muted: #756b5f;
+      --line: #d8cdbf;
+      --accent: #4c7f8f;
+      --accent2: #b57955;
+      --danger: #9f4f43;
+      --shadow: 0 18px 45px rgba(44, 35, 24, 0.16);
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(76,127,143,.16), transparent 34%),
+        radial-gradient(circle at bottom right, rgba(181,121,85,.15), transparent 35%),
+        var(--bg);
+      min-height: 100vh;
+    }
+
+    header {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 28px 18px 12px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: clamp(24px, 3vw, 36px);
+      letter-spacing: .02em;
+    }
+
+    .lead {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 14px;
+    }
+
+    main {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .panel, .preview-wrap {
+      background: rgba(255,255,255,.88);
+      border: 1px solid rgba(216,205,191,.9);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(8px);
+    }
+
+    .panel { padding: 18px; }
+
+    .settings-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+      align-items: start;
+    }
+
+    .settings-column {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      min-width: 0;
+    }
+
+    .section {
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(255,253,249,.72);
+    }
+
+    .section-title {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 0 0 12px;
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: .04em;
+    }
+
+    .hint {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    label {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+      margin: 12px 0 6px;
+      font-weight: 700;
+    }
+
+    input[type="text"], select, textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 10px 11px;
+      background: #fffdf9;
+      color: var(--ink);
+      font: inherit;
+      outline: none;
+    }
+
+    textarea {
+      min-height: 110px;
+      resize: vertical;
+      line-height: 1.6;
+    }
+
+    input[type="text"]:focus, select:focus, textarea:focus {
+      border-color: rgba(76,127,143,.7);
+      box-shadow: 0 0 0 3px rgba(76,127,143,.13);
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .check-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .check-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 8px 9px;
+      background: #fffdf9;
+      font-size: 13px;
+      color: var(--ink);
+      user-select: none;
+    }
+
+    .check-item input { margin: 0; }
+
+    .file-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      align-items: center;
+      margin-top: 8px;
+    }
+
+    input[type="file"] {
+      width: 100%;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    button {
+      appearance: none;
+      border: 0;
+      border-radius: 999px;
+      padding: 10px 14px;
+      cursor: pointer;
+      font-weight: 800;
+      letter-spacing: .02em;
+      color: white;
+      background: var(--accent);
+      transition: transform .08s ease, filter .15s ease;
+    }
+
+    button:hover { filter: brightness(1.04); }
+    button:active { transform: translateY(1px); }
+
+    button.secondary {
+      background: #8b8177;
+      padding: 8px 11px;
+      font-size: 12px;
+    }
+
+    button.danger { background: var(--danger); }
+
+    .preview-wrap {
+      padding: 18px;
+    }
+
+    .canvas-shell {
+      width: 100%;
+      overflow: hidden;
+      border-radius: 16px;
+      background: #e7ded1;
+      border: 1px solid var(--line);
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: auto;
+      cursor: grab;
+    }
+
+    canvas.dragging { cursor: grabbing; }
+
+    .preview-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 12px;
+    }
+
+    .small-note {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+      margin: 8px 0 0;
+    }
+
+    .font-status {
+      margin: 8px 0 0;
+      font-size: 12px;
+      line-height: 1.6;
+      color: var(--muted);
+    }
+
+    .font-status[data-state="ready"] {
+      color: #4f7059;
+    }
+
+    .font-status[data-state="error"] {
+      color: var(--danger);
+    }
+
+    .mode-switch {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .mode-option {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin: 0;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fffdf9;
+      color: var(--ink);
+      cursor: pointer;
+      user-select: none;
+      transition: border-color .15s ease, background .15s ease, box-shadow .15s ease;
+    }
+
+    .mode-option:has(input:checked) {
+      border-color: rgba(76,127,143,.72);
+      background: rgba(76,127,143,.10);
+      box-shadow: 0 0 0 2px rgba(76,127,143,.10);
+    }
+
+    .mode-option input {
+      margin: 0;
+    }
+
+    .traveler-panel[hidden] {
+      display: none;
+    }
+
+    .stamp-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .stamp-heading label {
+      margin: 0;
+    }
+
+    .stamp-count {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .stamp-count[data-full="true"] {
+      color: var(--danger);
+    }
+
+    .stamp-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .stamp-item {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      min-width: 0;
+      margin: 0;
+      padding: 9px 8px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fffdf9;
+      color: var(--ink);
+      font-size: 11px;
+      line-height: 1.25;
+      cursor: pointer;
+      user-select: none;
+      transition: opacity .15s ease, border-color .15s ease, background .15s ease;
+    }
+
+    .stamp-item:has(input:checked) {
+      border-color: rgba(76,127,143,.72);
+      background: rgba(76,127,143,.10);
+    }
+
+    .stamp-item.is-disabled {
+      opacity: .38;
+      cursor: not-allowed;
+    }
+
+    .stamp-item input {
+      flex: 0 0 auto;
+      margin: 0;
+    }
+
+    .stamp-item span {
+      min-width: 0;
+      overflow-wrap: anywhere;
+    }
+
+    footer {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 8px 18px 30px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.7;
+    }
+
+    @media (max-width: 980px) {
+      .settings-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 560px) {
+      header {
+        padding-top: 22px;
+      }
+
+      main {
+        padding-top: 12px;
+      }
+
+      .panel,
+      .preview-wrap {
+        border-radius: 14px;
+        padding: 12px;
+      }
+
+      .section {
+        padding: 14px;
+      }
+
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+
+      .stamp-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .preview-actions {
+        align-items: stretch;
+      }
+
+      .preview-actions button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>FFXIV Adventurer's Scrapbook</h1>
+    <p class="lead">旅人の机の上に広げた記録帳風のプロフィール画像を作る、非公式ファンツールです。画像と入力内容はブラウザ内で処理され、サーバーには保存されません。</p>
+  </header>
+
+  <main>
+    <section class="preview-wrap" aria-label="プレビュー">
+      <div class="canvas-shell">
+        <canvas id="cardCanvas" width="1920" height="1080" aria-label="生成画像プレビュー"></canvas>
+      </div>
+      <div class="preview-actions">
+        <button id="downloadBtn" type="button">PNG保存</button>
+        <span class="hint">1920×1080px / 16:9</span>
+      </div>
+    </section>
+
+    <section class="panel" aria-label="入力欄">
+      <div class="settings-grid">
+        <div class="settings-column">
+          <div class="section">
+            <h2 class="section-title">文字スタイル <span class="hint">入力した文字</span></h2>
+
+            <label for="fontStyle">フォント</label>
+            <select id="fontStyle">
+              <option value="klee" selected>Klee One（手帳風・標準）</option>
+              <option value="dancing">Dancing Script（英字筆記体）</option>
+              <option value="zen-kurenaido">Zen Kurenaido（細字手書き）</option>
+              <option value="zen-maru">Zen Maru Gothic（丸文字）</option>
+              <option value="hachi-maru">Hachi Maru Pop（かわいい）</option>
+            </select>
+            <p id="fontStatus" class="font-status" data-state="loading" aria-live="polite">フォントを読み込んでいます…</p>
+            <p class="small-note">キャラクター名、DC / World、Main Job、自由メモ、小写真のキャプションに反映されます。Dancing Script選択時、日本語はKlee Oneで表示されます。</p>
+          </div>
+
+          <div class="section">
+        <h2 class="section-title">Aetheryte Pass <span class="hint">左側の基本情報</span></h2>
+
+        <label for="charImage">キャラクターSS</label>
+        <div class="file-row">
+          <input id="charImage" type="file" accept="image/*" />
+          <button class="secondary danger" type="button" data-clear="char">削除</button>
+        </div>
+
+        <label for="charZoom">キャラクターSSズーム</label>
+        <input id="charZoom" type="range" min="100" max="180" value="118" />
+        <p class="small-note">Canvas上のキャラクターSS・小写真はドラッグで位置調整できます。</p>
+
+        <label for="charName">キャラクター名</label>
+        <input id="charName" type="text" maxlength="32" placeholder="例：Luca Kusakabe" />
+
+        <label for="dcWorldSelect">DC / World</label>
+        <select id="dcWorldSelect">
+          <option value="">未選択</option>
+
+          <optgroup label="日本｜Elemental">
+            <option value="Elemental / Aegis">Elemental / Aegis</option>
+            <option value="Elemental / Atomos">Elemental / Atomos</option>
+            <option value="Elemental / Carbuncle">Elemental / Carbuncle</option>
+            <option value="Elemental / Garuda">Elemental / Garuda</option>
+            <option value="Elemental / Gungnir">Elemental / Gungnir</option>
+            <option value="Elemental / Kujata">Elemental / Kujata</option>
+            <option value="Elemental / Tonberry">Elemental / Tonberry</option>
+            <option value="Elemental / Typhon">Elemental / Typhon</option>
+          </optgroup>
+
+          <optgroup label="日本｜Gaia">
+            <option value="Gaia / Alexander">Gaia / Alexander</option>
+            <option value="Gaia / Bahamut">Gaia / Bahamut</option>
+            <option value="Gaia / Durandal">Gaia / Durandal</option>
+            <option value="Gaia / Fenrir">Gaia / Fenrir</option>
+            <option value="Gaia / Ifrit">Gaia / Ifrit</option>
+            <option value="Gaia / Ridill">Gaia / Ridill</option>
+            <option value="Gaia / Tiamat">Gaia / Tiamat</option>
+            <option value="Gaia / Ultima">Gaia / Ultima</option>
+          </optgroup>
+
+          <optgroup label="日本｜Mana">
+            <option value="Mana / Anima">Mana / Anima</option>
+            <option value="Mana / Asura">Mana / Asura</option>
+            <option value="Mana / Chocobo">Mana / Chocobo</option>
+            <option value="Mana / Hades">Mana / Hades</option>
+            <option value="Mana / Ixion">Mana / Ixion</option>
+            <option value="Mana / Masamune">Mana / Masamune</option>
+            <option value="Mana / Pandaemonium">Mana / Pandaemonium</option>
+            <option value="Mana / Titan">Mana / Titan</option>
+          </optgroup>
+
+          <optgroup label="日本｜Meteor">
+            <option value="Meteor / Belias">Meteor / Belias</option>
+            <option value="Meteor / Mandragora">Meteor / Mandragora</option>
+            <option value="Meteor / Ramuh">Meteor / Ramuh</option>
+            <option value="Meteor / Shinryu" selected>Meteor / Shinryu</option>
+            <option value="Meteor / Unicorn">Meteor / Unicorn</option>
+            <option value="Meteor / Valefor">Meteor / Valefor</option>
+            <option value="Meteor / Yojimbo">Meteor / Yojimbo</option>
+            <option value="Meteor / Zeromus">Meteor / Zeromus</option>
+          </optgroup>
+
+          <optgroup label="北米｜Aether">
+            <option value="Aether / Adamantoise">Aether / Adamantoise</option>
+            <option value="Aether / Cactuar">Aether / Cactuar</option>
+            <option value="Aether / Faerie">Aether / Faerie</option>
+            <option value="Aether / Gilgamesh">Aether / Gilgamesh</option>
+            <option value="Aether / Jenova">Aether / Jenova</option>
+            <option value="Aether / Midgardsormr">Aether / Midgardsormr</option>
+            <option value="Aether / Sargatanas">Aether / Sargatanas</option>
+            <option value="Aether / Siren">Aether / Siren</option>
+          </optgroup>
+
+          <optgroup label="北米｜Crystal">
+            <option value="Crystal / Balmung">Crystal / Balmung</option>
+            <option value="Crystal / Brynhildr">Crystal / Brynhildr</option>
+            <option value="Crystal / Coeurl">Crystal / Coeurl</option>
+            <option value="Crystal / Diabolos">Crystal / Diabolos</option>
+            <option value="Crystal / Goblin">Crystal / Goblin</option>
+            <option value="Crystal / Malboro">Crystal / Malboro</option>
+            <option value="Crystal / Mateus">Crystal / Mateus</option>
+            <option value="Crystal / Zalera">Crystal / Zalera</option>
+          </optgroup>
+
+          <optgroup label="北米｜Dynamis">
+            <option value="Dynamis / Cuchulainn">Dynamis / Cuchulainn</option>
+            <option value="Dynamis / Golem">Dynamis / Golem</option>
+            <option value="Dynamis / Halicarnassus">Dynamis / Halicarnassus</option>
+            <option value="Dynamis / Kraken">Dynamis / Kraken</option>
+            <option value="Dynamis / Maduin">Dynamis / Maduin</option>
+            <option value="Dynamis / Marilith">Dynamis / Marilith</option>
+            <option value="Dynamis / Rafflesia">Dynamis / Rafflesia</option>
+            <option value="Dynamis / Seraph">Dynamis / Seraph</option>
+          </optgroup>
+
+          <optgroup label="北米｜Primal">
+            <option value="Primal / Behemoth">Primal / Behemoth</option>
+            <option value="Primal / Excalibur">Primal / Excalibur</option>
+            <option value="Primal / Exodus">Primal / Exodus</option>
+            <option value="Primal / Famfrit">Primal / Famfrit</option>
+            <option value="Primal / Hyperion">Primal / Hyperion</option>
+            <option value="Primal / Lamia">Primal / Lamia</option>
+            <option value="Primal / Leviathan">Primal / Leviathan</option>
+            <option value="Primal / Ultros">Primal / Ultros</option>
+          </optgroup>
+
+          <optgroup label="欧州｜Chaos">
+            <option value="Chaos / Cerberus">Chaos / Cerberus</option>
+            <option value="Chaos / Louisoix">Chaos / Louisoix</option>
+            <option value="Chaos / Moogle">Chaos / Moogle</option>
+            <option value="Chaos / Omega">Chaos / Omega</option>
+            <option value="Chaos / Phantom">Chaos / Phantom</option>
+            <option value="Chaos / Ragnarok">Chaos / Ragnarok</option>
+            <option value="Chaos / Sagittarius">Chaos / Sagittarius</option>
+            <option value="Chaos / Spriggan">Chaos / Spriggan</option>
+          </optgroup>
+
+          <optgroup label="欧州｜Light">
+            <option value="Light / Alpha">Light / Alpha</option>
+            <option value="Light / Lich">Light / Lich</option>
+            <option value="Light / Odin">Light / Odin</option>
+            <option value="Light / Phoenix">Light / Phoenix</option>
+            <option value="Light / Raiden">Light / Raiden</option>
+            <option value="Light / Shiva">Light / Shiva</option>
+            <option value="Light / Twintania">Light / Twintania</option>
+            <option value="Light / Zodiark">Light / Zodiark</option>
+          </optgroup>
+
+          <optgroup label="オセアニア｜Materia">
+            <option value="Materia / Bismarck">Materia / Bismarck</option>
+            <option value="Materia / Ravana">Materia / Ravana</option>
+            <option value="Materia / Sephirot">Materia / Sephirot</option>
+            <option value="Materia / Sophia">Materia / Sophia</option>
+            <option value="Materia / Zurvan">Materia / Zurvan</option>
+          </optgroup>
+
+          <option value="__custom__">その他・自由入力</option>
+        </select>
+
+        <div id="dcWorldCustomWrap" hidden>
+          <label for="dcWorldCustom">DC / World 自由入力</label>
+          <input id="dcWorldCustom" type="text" maxlength="40" placeholder="例：DC名 / World名" />
+        </div>
+        <p class="small-note">選択肢にない場合は「その他・自由入力」を選んでください。入力内容がそのまま画像に表示されます。</p>
+
+        <label for="mainJob">Main Job</label>
+        <input id="mainJob" type="text" value="Ninja" maxlength="24" />
+
+        <label for="qrImage">任意QRコード画像</label>
+        <div class="file-row">
+          <input id="qrImage" type="file" accept="image/*" />
+          <button class="secondary danger" type="button" data-clear="qr">削除</button>
+        </div>
+        <p class="small-note">QR画像はAetheryte Pass右下に小さく表示されます。未設定時は、石の装飾が表示されます。</p>
+      </div>
+
+          <div class="section">
+            <h2 class="section-title">Traveler Area <span class="hint">自由メモ／スタンプ</span></h2>
+
+            <label>表示タイプ</label>
+            <div class="mode-switch" role="radiogroup" aria-label="Traveler Areaの表示タイプ">
+              <label class="mode-option">
+                <input type="radio" name="travelerMode" value="memo" checked />
+                <span>自由メモ</span>
+              </label>
+              <label class="mode-option">
+                <input type="radio" name="travelerMode" value="stamp" />
+                <span>スタンプ</span>
+              </label>
+            </div>
+
+            <div id="memoSettings" class="traveler-panel">
+              <label for="memo">メモ</label>
+              <textarea id="memo" maxlength="80" placeholder="例：
+深夜多めです
+SS撮影好き
+零式練習中
+フレ募集中
+気軽にどうぞ"></textarea>
+              <p class="small-note">全角10文字×5行程度が目安です。描画時に最大5行まで表示します。</p>
+            </div>
+
+            <div id="stampSettings" class="traveler-panel" hidden>
+              <div class="stamp-heading">
+                <label>スタンプ選択</label>
+                <span id="stampCount" class="stamp-count" data-full="false">選択中 0 / 6</span>
+              </div>
+              <div class="stamp-grid" id="stampGrid">
+                <label class="stamp-item"><input type="checkbox" name="stamp" value="CASUAL" /><span>CASUAL</span></label>
+                <label class="stamp-item"><input type="checkbox" name="stamp" value="STORY" /><span>STORY</span></label>
+                <label class="stamp-item"><input type="checkbox" name="stamp" value="BATTLE" /><span>BATTLE</span></label>
+                <label class="stamp-item"><input type="checkbox" name="stamp" value="HIGH-END" /><span>HIGH-END</span></label>
+                <label class="stamp-item"><input type="checkbox" name="stamp" value="PvP" /><span>PvP</span></label>
+                <label class="stamp-item"><input type="checkbox" name="stamp" value="GPOSE" /><span>GPOSE</span></label>
+                <label class="stamp-item"><input type="checkbox" name="stamp" value="HOUSING" /><span>HOUSING</span></label>
+                <label class="stamp-item"><input type="checkbox" name="stamp" value="CRAFTING" /><span>CRAFTING</span></label>
+                <label class="stamp-item"><input type="checkbox" name="stamp" value="GATHERING" /><span>GATHERING</span></label>
+                <label class="stamp-item"><input type="checkbox" name="stamp" value="FISHING" /><span>FISHING</span></label>
+                <label class="stamp-item"><input type="checkbox" name="stamp" value="TREASURE MAP" /><span>TREASURE MAP</span></label>
+                <label class="stamp-item"><input type="checkbox" name="stamp" value="DEEP DUNGEON" /><span>DEEP DUNGEON</span></label>
+                <label class="stamp-item"><input type="checkbox" name="stamp" value="ROLEPLAY" /><span>ROLEPLAY</span></label>
+                <label class="stamp-item"><input type="checkbox" name="stamp" value="SOCIAL" /><span>SOCIAL</span></label>
+                <label class="stamp-item"><input type="checkbox" name="stamp" value="PERFORMANCE" /><span>PERFORMANCE</span></label>
+              </div>
+              <p class="small-note">最大6個まで選択できます。6個選ぶと、未選択の項目は一時的に選べなくなります。</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-column">
+          <div class="section">
+        <h2 class="section-title">宿レシート <span class="hint">定型情報</span></h2>
+
+        <label>Active Time</label>
+        <div class="check-grid" id="activeTimeBox">
+          <label class="check-item"><input type="checkbox" name="activeTime" value="Morning" />朝</label>
+          <label class="check-item"><input type="checkbox" name="activeTime" value="Day" />昼</label>
+          <label class="check-item"><input type="checkbox" name="activeTime" value="Evening" />夕方</label>
+          <label class="check-item"><input type="checkbox" name="activeTime" value="Night" checked />夜</label>
+          <label class="check-item"><input type="checkbox" name="activeTime" value="Late" />深夜</label>
+        </div>
+        <p class="small-note">3つ以上選ぶと、宿レシートには <strong>Eorzean Resident</strong> と表示します。</p>
+
+        <label for="vc">VC可否</label>
+        <select id="vc">
+          <option value="OK">OK</option>
+          <option value="NG" selected>NG</option>
+          <option value="Listen Only">聞き専</option>
+          <option value="Ask">要相談</option>
+        </select>
+
+        <label>使用言語</label>
+        <div class="check-grid" id="languageBox">
+          <label class="check-item"><input type="checkbox" name="language" value="JP" checked />JP</label>
+          <label class="check-item"><input type="checkbox" name="language" value="EN" />EN</label>
+          <label class="check-item"><input type="checkbox" name="language" value="DE" />DE</label>
+          <label class="check-item"><input type="checkbox" name="language" value="FR" />FR</label>
+          <label class="check-item"><input type="checkbox" name="language" value="CN" />CN</label>
+          <label class="check-item"><input type="checkbox" name="language" value="KR" />KR</label>
+        </div>
+      </div>
+
+          <div class="section">
+        <h2 class="section-title">小写真 <span class="hint">右側に2枚</span></h2>
+
+        <label for="photo1">小写真 1</label>
+        <div class="file-row">
+          <input id="photo1" type="file" accept="image/*" />
+          <button class="secondary danger" type="button" data-clear="photo1">削除</button>
+        </div>
+        <label for="photo1Zoom">小写真 1 ズーム</label>
+        <input id="photo1Zoom" type="range" min="100" max="180" value="112" />
+        <label for="caption1">小写真 1 キャプション</label>
+        <input id="caption1" type="text" maxlength="14" placeholder="例：my room" />
+        <label for="caption1Color">小写真 1 キャプション文字色</label>
+        <select id="caption1Color">
+          <option value="dark" selected>黒文字</option>
+          <option value="light">白文字</option>
+        </select>
+
+        <label for="photo2">小写真 2</label>
+        <div class="file-row">
+          <input id="photo2" type="file" accept="image/*" />
+          <button class="secondary danger" type="button" data-clear="photo2">削除</button>
+        </div>
+        <label for="photo2Zoom">小写真 2 ズーム</label>
+        <input id="photo2Zoom" type="range" min="100" max="180" value="112" />
+        <label for="caption2">小写真 2 キャプション</label>
+        <input id="caption2" type="text" maxlength="14" placeholder="例：friends" />
+        <label for="caption2Color">小写真 2 キャプション文字色</label>
+        <select id="caption2Color">
+          <option value="dark" selected>黒文字</option>
+          <option value="light">白文字</option>
+        </select>
+      </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <strong>企画・デザイン・制作：鱗の旅人</strong><br>
+    非公式ファンツールです。SQUARE ENIXおよびFINAL FANTASY XIV公式とは関係ありません。公式素材・公式アイコンは使用していません。生成画像の利用時は、FINAL FANTASY XIVの利用規約・素材利用条件・各コミュニティのルールを確認してください。
+  </footer>
+
+  <script>
+    const canvas = document.getElementById('cardCanvas');
+    const ctx = canvas.getContext('2d');
+    const OUT_W = canvas.width;
+    const OUT_H = canvas.height;
+    const W = 1200;
+    const H = 675;
+
+    const els = {
+      charImage: document.getElementById('charImage'),
+      qrImage: document.getElementById('qrImage'),
+      photo1: document.getElementById('photo1'),
+      photo2: document.getElementById('photo2'),
+      charZoom: document.getElementById('charZoom'),
+      photo1Zoom: document.getElementById('photo1Zoom'),
+      photo2Zoom: document.getElementById('photo2Zoom'),
+      charName: document.getElementById('charName'),
+      fontStyle: document.getElementById('fontStyle'),
+      fontStatus: document.getElementById('fontStatus'),
+      dcWorldSelect: document.getElementById('dcWorldSelect'),
+      dcWorldCustom: document.getElementById('dcWorldCustom'),
+      dcWorldCustomWrap: document.getElementById('dcWorldCustomWrap'),
+      mainJob: document.getElementById('mainJob'),
+      memo: document.getElementById('memo'),
+      memoSettings: document.getElementById('memoSettings'),
+      stampSettings: document.getElementById('stampSettings'),
+      stampCount: document.getElementById('stampCount'),
+      stampGrid: document.getElementById('stampGrid'),
+      vc: document.getElementById('vc'),
+      caption1: document.getElementById('caption1'),
+      caption2: document.getElementById('caption2'),
+      caption1Color: document.getElementById('caption1Color'),
+      caption2Color: document.getElementById('caption2Color'),
+      downloadBtn: document.getElementById('downloadBtn')
+    };
+
+    const images = {
+      char: null,
+      qr: null,
+      photo1: null,
+      photo2: null
+    };
+
+    const baseBackImage = new Image();
+    let baseBackReady = false;
+    let baseBackFailed = false;
+    baseBackImage.onload = () => {
+      baseBackReady = true;
+      draw();
+    };
+    baseBackImage.onerror = () => {
+      baseBackFailed = true;
+      draw();
+    };
+    baseBackImage.src = 'scrapbook_base_back.png';
+
+    const imageState = {
+      char: { offsetX: 0, offsetY: 0 },
+      photo1: { offsetX: 0, offsetY: 0 },
+      photo2: { offsetX: 0, offsetY: 0 }
+    };
+
+    const hitAreas = {
+      char: { x: 87, y: 124, w: 384, h: 280 },
+      photo1: { x: 596, y: 380, w: 202, h: 202 },
+      photo2: { x: 834, y: 392, w: 202, h: 202 }
+    };
+
+    let dragTarget = null;
+    let lastPointer = null;
+
+    const FALLBACK_HAND_FONT = '"Segoe Print", "Comic Sans MS", "Yu Kyokasho", "Hiragino Maru Gothic ProN", "Yu Gothic", cursive';
+    const SCRIPT_FONT = '"Segoe Script", "Brush Script MT", "Bradley Hand", cursive';
+
+    const FONT_OPTIONS = {
+      klee: {
+        stack: '"ScrapKleeOne"',
+        label: 'Klee One',
+        loads: [
+          { family: '"ScrapKleeOne"', sample: '旅人の記録 Meteor Shinryu Ninja' }
+        ]
+      },
+      dancing: {
+        stack: '"ScrapDancingScript", "ScrapKleeOne"',
+        label: 'Dancing Script',
+        loads: [
+          { family: '"ScrapDancingScript"', sample: 'Adventurer Profile Meteor Shinryu Ninja' },
+          { family: '"ScrapKleeOne"', sample: '旅人の記録' }
+        ]
+      },
+      'zen-kurenaido': {
+        stack: '"ScrapZenKurenaido"',
+        label: 'Zen Kurenaido',
+        loads: [
+          { family: '"ScrapZenKurenaido"', sample: '旅人の記録 Meteor Shinryu Ninja' }
+        ]
+      },
+      'zen-maru': {
+        stack: '"ScrapZenMaruGothic"',
+        label: 'Zen Maru Gothic',
+        loads: [
+          { family: '"ScrapZenMaruGothic"', sample: '旅人の記録 Meteor Shinryu Ninja' }
+        ]
+      },
+      'hachi-maru': {
+        stack: '"ScrapHachiMaruPop"',
+        label: 'Hachi Maru Pop',
+        loads: [
+          { family: '"ScrapHachiMaruPop"', sample: '旅人の記録 Meteor Shinryu Ninja' }
+        ]
+      }
+    };
+
+    let activeHandFont = `${FONT_OPTIONS.klee.stack}, ${FALLBACK_HAND_FONT}`;
+    let loadedFontKey = null;
+    let fontLoadSequence = 0;
+    let fontLoadPromise = Promise.resolve(true);
+
+    function getSelectedFontOption() {
+      return FONT_OPTIONS[els.fontStyle.value] || FONT_OPTIONS.klee;
+    }
+
+    function getHandFontStack() {
+      return activeHandFont || FALLBACK_HAND_FONT;
+    }
+
+    function setFontStatus(message, state) {
+      els.fontStatus.textContent = message;
+      els.fontStatus.dataset.state = state;
+    }
+
+    async function loadSelectedFont() {
+      const sequence = ++fontLoadSequence;
+      const selectedKey = els.fontStyle.value;
+      const option = getSelectedFontOption();
+
+      setFontStatus(`${option.label} を読み込んでいます…`, 'loading');
+
+      const task = (async () => {
+        try {
+          if (!document.fonts || typeof document.fonts.load !== 'function') {
+            throw new Error('Font Loading API is unavailable.');
+          }
+
+          const results = await Promise.all(
+            option.loads.map(item => document.fonts.load(`400 32px ${item.family}`, item.sample))
+          );
+          await document.fonts.ready;
+
+          if (sequence !== fontLoadSequence) return false;
+          if (results.some(faces => !faces || faces.length === 0)) {
+            throw new Error('Font file could not be loaded.');
+          }
+
+          activeHandFont = `${option.stack}, ${FALLBACK_HAND_FONT}`;
+          loadedFontKey = selectedKey;
+          const suffix = selectedKey === 'dancing' ? '（日本語はKlee One）' : '';
+          setFontStatus(`${option.label} を使用中${suffix}`, 'ready');
+          draw();
+          return true;
+        } catch (error) {
+          if (sequence !== fontLoadSequence) return false;
+          activeHandFont = FALLBACK_HAND_FONT;
+          loadedFontKey = null;
+          setFontStatus(`${option.label}を読み込めなかったため、端末の代替フォントで表示しています。`, 'error');
+          draw();
+          return false;
+        }
+      })();
+
+      fontLoadPromise = task;
+      return task;
+    }
+
+    async function ensureSelectedFontReady() {
+      const selectedKey = els.fontStyle.value;
+      if (loadedFontKey === selectedKey) return true;
+      await fontLoadPromise;
+      if (loadedFontKey === selectedKey) return true;
+      return loadSelectedFont();
+    }
+
+    function setHandFont(size, weight = 500) {
+      ctx.font = `${weight} ${size}px ${getHandFontStack()}`;
+    }
+
+    function measureHandText(text, size, weight = 500, tracking = 0) {
+      setHandFont(size, weight);
+      return Array.from(text || '').reduce((sum, ch) => sum + ctx.measureText(ch).width + tracking, 0);
+    }
+
+    function drawHandText(text, x, y, options = {}) {
+      const safeText = text || '';
+      const {
+        size = 30,
+        minSize = 14,
+        maxWidth = 9999,
+        weight = 500,
+        color = '#2f2a24',
+        align = 'left',
+        baseline = 'alphabetic',
+        jitter = 0.75,
+        rotate = 0.012,
+        tracking = -0.8,
+        shadow = false
+      } = options;
+
+      let fontSize = size;
+      while (fontSize > minSize && measureHandText(safeText, fontSize, weight, tracking) > maxWidth) {
+        fontSize -= 1;
+      }
+      const totalWidth = measureHandText(safeText, fontSize, weight, tracking);
+      let startX = x;
+      if (align === 'center') startX = x - totalWidth / 2;
+      if (align === 'right') startX = x - totalWidth;
+
+      ctx.save();
+      setHandFont(fontSize, weight);
+      ctx.fillStyle = color;
+      ctx.textAlign = 'left';
+      ctx.textBaseline = baseline;
+      if (shadow) {
+        ctx.shadowColor = 'rgba(0,0,0,.55)';
+        ctx.shadowBlur = 4;
+        ctx.shadowOffsetY = 2;
+      }
+
+      let cursor = startX;
+      Array.from(safeText).forEach((ch, i) => {
+        const w = ctx.measureText(ch).width;
+        const wobbleY = Math.sin(i * 1.73) * jitter;
+        const wobbleRot = Math.sin(i * 1.21) * rotate;
+        ctx.save();
+        ctx.translate(cursor, y + wobbleY);
+        ctx.rotate(wobbleRot);
+        ctx.fillText(ch, 0, 0);
+        ctx.restore();
+        cursor += w + tracking;
+      });
+      ctx.restore();
+      return fontSize;
+    }
+
+
+    function value(id) {
+      return (els[id]?.value || '').trim();
+    }
+
+    function selectedValues(name) {
+      return Array.from(document.querySelectorAll(`input[name="${name}"]:checked`)).map(el => el.value);
+    }
+
+    const STAMP_LIMIT = 6;
+    const STAMP_COLORS = {
+      battle: '#8f3f3d',
+      life: '#318a93',
+      other: '#55758a'
+    };
+
+    const STAMP_DEFINITIONS = {
+      CASUAL: { group: 'other', shape: 'circle', frame: 'dashed', decor: 'casual', lines: ['CASUAL'], angle: -0.08 },
+      STORY: { group: 'other', shape: 'ellipse', frame: 'single', decor: 'story', lines: ['STORY'], angle: 0.055 },
+      BATTLE: { group: 'battle', shape: 'circle', frame: 'double', decor: 'battle', lines: ['BATTLE'], angle: -0.04 },
+      'HIGH-END': { group: 'battle', shape: 'rounded', frame: 'double', decor: 'highEnd', lines: ['HIGH-END'], angle: 0.07 },
+      PvP: { group: 'battle', shape: 'rounded', frame: 'single', decor: 'pvp', lines: ['PvP'], angle: -0.09 },
+      GPOSE: { group: 'other', shape: 'square', frame: 'single', decor: 'gpose', lines: ['GPOSE'], angle: 0.045 },
+      HOUSING: { group: 'life', shape: 'rounded', frame: 'single', decor: 'housing', lines: ['HOUSING'], angle: -0.055 },
+      CRAFTING: { group: 'life', shape: 'circle', frame: 'double', decor: 'crafting', lines: ['CRAFTING'], angle: 0.08 },
+      GATHERING: { group: 'life', shape: 'vertical', frame: 'dashed', decor: 'gathering', lines: ['GATHER', 'ING'], angle: -0.035 },
+      FISHING: { group: 'life', shape: 'ellipse', frame: 'single', decor: 'fishing', lines: ['FISHING'], angle: 0.065 },
+      'TREASURE MAP': { group: 'battle', shape: 'ellipse', frame: 'dashed', decor: 'treasure', lines: ['TREASURE', 'MAP'], angle: -0.07 },
+      'DEEP DUNGEON': { group: 'battle', shape: 'circle', frame: 'double', decor: 'deepDungeon', lines: ['DEEP', 'DUNGEON'], angle: 0.04 },
+      ROLEPLAY: { group: 'other', shape: 'ellipse', frame: 'single', decor: 'roleplay', lines: ['ROLEPLAY'], angle: -0.05 },
+      SOCIAL: { group: 'other', shape: 'circle', frame: 'single', decor: 'social', lines: ['SOCIAL'], angle: 0.075 },
+      PERFORMANCE: { group: 'life', shape: 'rounded', frame: 'single', decor: 'performance', lines: ['PERFORM', 'ANCE'], angle: -0.065 }
+    };
+
+    function getTravelerMode() {
+      return document.querySelector('input[name="travelerMode"]:checked')?.value || 'memo';
+    }
+
+    function getSelectedStamps() {
+      return Array.from(document.querySelectorAll('input[name="stamp"]:checked')).map(el => el.value);
+    }
+
+    function updateTravelerMode() {
+      const stampMode = getTravelerMode() === 'stamp';
+      els.memoSettings.hidden = stampMode;
+      els.stampSettings.hidden = !stampMode;
+      draw();
+    }
+
+    function updateStampLimit(changedCheckbox = null) {
+      let selected = getSelectedStamps();
+      if (selected.length > STAMP_LIMIT && changedCheckbox) {
+        changedCheckbox.checked = false;
+        selected = getSelectedStamps();
+      }
+
+      const full = selected.length >= STAMP_LIMIT;
+      els.stampCount.textContent = `選択中 ${selected.length} / ${STAMP_LIMIT}`;
+      els.stampCount.dataset.full = String(full);
+
+      document.querySelectorAll('input[name="stamp"]').forEach(input => {
+        const disable = full && !input.checked;
+        input.disabled = disable;
+        input.closest('.stamp-item')?.classList.toggle('is-disabled', disable);
+      });
+    }
+
+    function getDcWorldLabel() {
+      if (els.dcWorldSelect.value === '__custom__') {
+        return value('dcWorldCustom');
+      }
+      return els.dcWorldSelect.value.trim();
+    }
+
+    function updateDcWorldCustomVisibility() {
+      const isCustom = els.dcWorldSelect.value === '__custom__';
+      els.dcWorldCustomWrap.hidden = !isCustom;
+      els.dcWorldCustom.disabled = !isCustom;
+    }
+
+    function getActiveTimeLabel() {
+      const active = selectedValues('activeTime');
+      if (active.length >= 3) return 'Eorzean Resident';
+      return active.join('/') || '—';
+    }
+
+    function getLanguageLabel() {
+      const langs = selectedValues('language');
+      return langs.join('/') || '—';
+    }
+
+    function getCaptionColor(key) {
+      const choice = key === 'photo1' ? els.caption1Color.value : els.caption2Color.value;
+      return choice === 'light' ? '#fffaf0' : '#2f2a24';
+    }
+
+    function loadImageFromInput(input, key) {
+      const file = input.files && input.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        const img = new Image();
+        img.onload = () => {
+          images[key] = img;
+          if (imageState[key]) {
+            imageState[key].offsetX = 0;
+            imageState[key].offsetY = 0;
+          }
+          draw();
+        };
+        img.src = reader.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function clearImage(key) {
+      images[key] = null;
+      if (imageState[key]) {
+        imageState[key].offsetX = 0;
+        imageState[key].offsetY = 0;
+      }
+      const input = els[key === 'char' ? 'charImage' : key === 'qr' ? 'qrImage' : key];
+      if (input) input.value = '';
+      draw();
+    }
+
+    function roundRect(c, x, y, w, h, r) {
+      const radius = Math.min(r, w / 2, h / 2);
+      c.beginPath();
+      c.moveTo(x + radius, y);
+      c.arcTo(x + w, y, x + w, y + h, radius);
+      c.arcTo(x + w, y + h, x, y + h, radius);
+      c.arcTo(x, y + h, x, y, radius);
+      c.arcTo(x, y, x + w, y, radius);
+      c.closePath();
+    }
+
+    function drawShadowPaper(x, y, w, h, r, fill, stroke) {
+      ctx.save();
+      ctx.shadowColor = 'rgba(44, 35, 24, 0.24)';
+      ctx.shadowBlur = 24;
+      ctx.shadowOffsetY = 14;
+      roundRect(ctx, x, y, w, h, r);
+      ctx.fillStyle = fill;
+      ctx.fill();
+      ctx.shadowColor = 'transparent';
+      ctx.lineWidth = 1.5;
+      ctx.strokeStyle = stroke || 'rgba(95,76,54,.22)';
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function withRotation(x, y, w, h, rot, fn) {
+      ctx.save();
+      ctx.translate(x + w / 2, y + h / 2);
+      ctx.rotate(rot);
+      ctx.translate(-w / 2, -h / 2);
+      fn();
+      ctx.restore();
+    }
+
+    function drawTape(x, y, w, h, rot, tone = 'rgba(236, 222, 185, .72)') {
+      ctx.save();
+      ctx.translate(x + w / 2, y + h / 2);
+      ctx.rotate(rot || 0);
+      ctx.fillStyle = tone;
+      ctx.strokeStyle = 'rgba(129, 110, 76, .18)';
+      ctx.lineWidth = 1;
+      roundRect(ctx, -w / 2, -h / 2, w, h, 5);
+      ctx.fill();
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawDeskBackground() {
+      const grad = ctx.createLinearGradient(0, 0, W, H);
+      grad.addColorStop(0, '#dcc8af');
+      grad.addColorStop(.45, '#c8ab8b');
+      grad.addColorStop(1, '#9d7557');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, W, H);
+
+      ctx.globalAlpha = .18;
+      for (let i = 0; i < 34; i++) {
+        const x = (i * 137) % W;
+        const y = (i * 91) % H;
+        const w = 180 + (i % 5) * 40;
+        ctx.strokeStyle = i % 2 ? '#5f3c27' : '#f2dfc8';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(x - w, y);
+        ctx.bezierCurveTo(x - 50, y - 20, x + 80, y + 26, x + w, y - 8);
+        ctx.stroke();
+      }
+      ctx.globalAlpha = 1;
+
+      ctx.fillStyle = 'rgba(48, 31, 20, .12)';
+      ctx.fillRect(0, 0, W, H);
+    }
+
+
+    function drawBaseBackImage() {
+      if (!baseBackReady) return false;
+      ctx.save();
+      ctx.drawImage(baseBackImage, 0, 0, W, H);
+      ctx.restore();
+      return true;
+    }
+
+    function drawImageCover(img, x, y, w, h, state, zoomValue) {
+      if (!img) return false;
+      const zoom = (Number(zoomValue) || 100) / 100;
+      const base = Math.max(w / img.width, h / img.height) * zoom;
+      const dw = img.width * base;
+      const dh = img.height * base;
+      const dx = x + (w - dw) / 2 + (state?.offsetX || 0);
+      const dy = y + (h - dh) / 2 + (state?.offsetY || 0);
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(x, y, w, h);
+      ctx.clip();
+      ctx.drawImage(img, dx, dy, dw, dh);
+      ctx.restore();
+      return true;
+    }
+
+    function drawImageContain(img, x, y, w, h) {
+      if (!img) return false;
+      const scale = Math.min(w / img.width, h / img.height);
+      const dw = img.width * scale;
+      const dh = img.height * scale;
+      const dx = x + (w - dw) / 2;
+      const dy = y + (h - dh) / 2;
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(x, y, w, h);
+      ctx.clip();
+      ctx.drawImage(img, dx, dy, dw, dh);
+      ctx.restore();
+      return true;
+    }
+
+    function drawPlaceholder(x, y, w, h, label) {
+      ctx.save();
+      const grad = ctx.createLinearGradient(x, y, x + w, y + h);
+      grad.addColorStop(0, '#b9c4c1');
+      grad.addColorStop(1, '#738f92');
+      ctx.fillStyle = grad;
+      ctx.fillRect(x, y, w, h);
+      ctx.strokeStyle = 'rgba(255,255,255,.45)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(x + 25, y + h - 38);
+      ctx.lineTo(x + w * .38, y + h * .56);
+      ctx.lineTo(x + w * .53, y + h - 42);
+      ctx.lineTo(x + w - 24, y + h * .42);
+      ctx.lineTo(x + w - 24, y + h - 24);
+      ctx.lineTo(x + 25, y + h - 24);
+      ctx.closePath();
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(x + w - 62, y + 48, 18, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.font = '800 18px system-ui, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillStyle = 'rgba(255,255,255,.78)';
+      ctx.fillText(label, x + w / 2, y + h / 2 + 6);
+      ctx.restore();
+    }
+
+    function fitText(text, maxWidth, baseSize, minSize, weight, family) {
+      let size = baseSize;
+      const safeText = text || '';
+      do {
+        ctx.font = `${weight || 800} ${size}px ${family || 'system-ui, sans-serif'}`;
+        if (ctx.measureText(safeText).width <= maxWidth) break;
+        size -= 1;
+      } while (size >= minSize);
+      return size;
+    }
+
+    function drawPassField(label, text, x, y, w) {
+      ctx.save();
+      ctx.fillStyle = 'rgba(80,64,48,.54)';
+      ctx.font = '800 11px system-ui, sans-serif';
+      ctx.fillText(label, x, y);
+      ctx.fillStyle = '#2f2a24';
+      const handFont = getHandFontStack();
+      const size = fitText(text || '—', w, 22, 12, 800, handFont);
+      ctx.font = `800 ${size}px ${handFont}`;
+      ctx.fillText(text || '—', x, y + 25);
+      ctx.strokeStyle = 'rgba(112,89,61,.26)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(x, y + 35);
+      ctx.lineTo(x + w, y + 35);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawQrFallbackDecoration(x, y) {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(-0.08);
+      ctx.translate(12, 8);
+
+      ctx.strokeStyle = 'rgba(76,127,143,.72)';
+      ctx.fillStyle = 'rgba(76,127,143,.11)';
+      ctx.lineWidth = 2;
+
+      ctx.beginPath();
+      ctx.moveTo(26, 0);
+      ctx.lineTo(49, 22);
+      ctx.lineTo(31, 58);
+      ctx.lineTo(8, 38);
+      ctx.lineTo(12, 12);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(26, 0);
+      ctx.lineTo(26, 47);
+      ctx.moveTo(12, 12);
+      ctx.lineTo(49, 22);
+      ctx.moveTo(8, 38);
+      ctx.lineTo(31, 58);
+      ctx.stroke();
+
+      ctx.restore();
+    }
+
+    function drawUnderPaper(x, y, w, h, rot, fill = '#d8ccb3') {
+      withRotation(x, y, w, h, rot, () => {
+        drawShadowPaper(0, 0, w, h, 10, fill, 'rgba(70,55,40,.14)');
+        ctx.save();
+        ctx.strokeStyle = 'rgba(120,94,68,.18)';
+        for (let i = 18; i < w; i += 28) {
+          ctx.beginPath();
+          ctx.moveTo(i, 12);
+          ctx.lineTo(i - 8, h - 14);
+          ctx.stroke();
+        }
+        ctx.restore();
+      });
+    }
+
+    function drawFixedDecorations() {
+      drawUnderPaper(635, 49, 116, 48, -0.12, '#d8ccab');
+      drawUnderPaper(1006, 62, 88, 38, 0.08, '#d3c7aa');
+      drawUnderPaper(968, 508, 178, 112, -0.10, '#d8caa8');
+      drawUnderPaper(556, 312, 142, 58, -0.18, '#d2c3a4');
+      drawUnderPaper(718, 317, 136, 54, 0.12, '#cfc1a6');
+      drawUnderPaper(842, 324, 152, 62, -0.05, '#d9c7ad');
+      drawUnderPaper(662, 592, 116, 42, 0.10, '#d3c1a4');
+      drawUnderPaper(770, 590, 140, 46, -0.07, '#cdbb9d');
+
+      ctx.save();
+      ctx.translate(1092, 86);
+      ctx.rotate(.16);
+      ctx.shadowColor = 'rgba(44,35,24,.2)';
+      ctx.shadowBlur = 12;
+      ctx.fillStyle = '#c59c64';
+      ctx.beginPath();
+      ctx.arc(0, 0, 44, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.shadowColor = 'transparent';
+      ctx.strokeStyle = 'rgba(55,42,32,.38)';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.arc(0, 0, 34, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.strokeStyle = 'rgba(55,42,32,.55)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(0, -28);
+      ctx.lineTo(8, 0);
+      ctx.lineTo(0, 28);
+      ctx.lineTo(-8, 0);
+      ctx.closePath();
+      ctx.stroke();
+      ctx.font = '700 12px Georgia, serif';
+      ctx.textAlign = 'center';
+      ctx.fillStyle = 'rgba(55,42,32,.62)';
+      ctx.fillText('N', 0, -18);
+      ctx.restore();
+
+      ctx.save();
+      ctx.translate(520, 582);
+      ctx.rotate(.18);
+      ctx.strokeStyle = 'rgba(44, 96, 72, .48)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(0, 58);
+      ctx.quadraticCurveTo(24, 22, 64, 0);
+      ctx.stroke();
+      for (let i = 0; i < 6; i++) {
+        const t = i * 10 + 8;
+        ctx.beginPath();
+        ctx.moveTo(t, 46 - i * 7);
+        ctx.quadraticCurveTo(t - 22, 35 - i * 6, t - 8, 18 - i * 3);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(t + 5, 42 - i * 7);
+        ctx.quadraticCurveTo(t + 24, 28 - i * 6, t + 18, 12 - i * 3);
+        ctx.stroke();
+      }
+      ctx.restore();
+
+      ctx.strokeStyle = 'rgba(68,48,34,.24)';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(30, 635);
+      ctx.bezierCurveTo(180, 600, 310, 684, 470, 618);
+      ctx.bezierCurveTo(560, 582, 634, 628, 714, 600);
+      ctx.bezierCurveTo(782, 577, 866, 622, 928, 598);
+      ctx.stroke();
+
+      ctx.save();
+      ctx.translate(1018, 566);
+      ctx.rotate(-0.12);
+      ctx.strokeStyle = 'rgba(76,127,143,.36)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(0, 0, 18, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(-56, 10);
+      ctx.quadraticCurveTo(-16, -14, 12, 8);
+      ctx.quadraticCurveTo(36, 26, 70, 2);
+      ctx.stroke();
+      ctx.restore();
+
+      ctx.save();
+      ctx.translate(103, 78);
+      ctx.rotate(-0.18);
+      ctx.strokeStyle = 'rgba(129,97,68,.24)';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(0, 0, 118, 26);
+      ctx.font = '700 11px "Courier New", monospace';
+      ctx.fillStyle = 'rgba(76,58,43,.42)';
+      ctx.fillText('TRAVEL NOTE', 13, 17);
+      ctx.restore();
+    }
+
+    function drawAetherytePass() {
+      const outerX = 58, outerY = 56, outerW = 448, outerH = 558;
+      drawTape(100, 35, 128, 36, -0.13);
+      drawTape(374, 45, 120, 32, 0.12);
+      withRotation(outerX, outerY, outerW, outerH, -0.022, () => {
+        drawShadowPaper(0, 0, outerW, outerH, 22, '#eadfcb', 'rgba(70,55,40,.24)');
+
+        roundRect(ctx, 16, 16, outerW - 32, outerH - 32, 18);
+        ctx.strokeStyle = 'rgba(101,76,55,.23)';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        ctx.fillStyle = '#3a3027';
+        ctx.font = '900 28px Georgia, "Times New Roman", serif';
+        ctx.fillText('AETHERYTE PASS', 30, 44);
+        ctx.font = '800 10px system-ui, sans-serif';
+        ctx.fillStyle = 'rgba(65,51,39,.56)';
+        ctx.fillText('FIELD RECORD / ADVENTURER PROFILE', 32, 60);
+
+        ctx.strokeStyle = 'rgba(76,127,143,.48)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(outerW - 118, 37);
+        ctx.lineTo(outerW - 34, 37);
+        ctx.moveTo(outerW - 118, 47);
+        ctx.lineTo(outerW - 54, 47);
+        ctx.stroke();
+
+        const p = { x: 28, y: 74, w: 384, h: 280 };
+        roundRect(ctx, p.x - 10, p.y - 10, p.w + 20, p.h + 20, 16);
+        ctx.fillStyle = '#f8f2e6';
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(70,55,40,.2)';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        if (!drawImageCover(images.char, p.x, p.y, p.w, p.h, imageState.char, els.charZoom.value)) {
+          drawPlaceholder(p.x, p.y, p.w, p.h, 'CHARACTER SS');
+        }
+        ctx.strokeStyle = 'rgba(255,255,255,.62)';
+        ctx.lineWidth = 6;
+        ctx.strokeRect(p.x + 3, p.y + 3, p.w - 6, p.h - 6);
+        ctx.strokeStyle = 'rgba(60,45,32,.32)';
+        ctx.lineWidth = 1.5;
+        ctx.strokeRect(p.x, p.y, p.w, p.h);
+
+        const name = value('charName');
+        ctx.fillStyle = 'rgba(72,56,42,.56)';
+        ctx.font = '800 11px system-ui, sans-serif';
+        ctx.fillText('CHARACTER NAME', 32, 392);
+        if (name) {
+          drawHandText(name, 32, 427, {
+            size: 36,
+            minSize: 17,
+            maxWidth: 360,
+            weight: 700,
+            color: '#2f2a24',
+            jitter: 0.55,
+            rotate: 0.011,
+            tracking: -1.2
+          });
+        } else {
+          ctx.strokeStyle = 'rgba(112,89,61,.26)';
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(32, 427);
+          ctx.lineTo(355, 427);
+          ctx.stroke();
+        }
+
+        drawPassField('DC / WORLD', getDcWorldLabel(), 32, 462, 318);
+        drawPassField('MAIN JOB', value('mainJob'), 32, 512, 210);
+
+
+        const qx = outerW - 118;
+        const qy = outerH - 118;
+        const qs = 76;
+
+        if (images.qr) {
+          ctx.fillStyle = '#fffdf9';
+          ctx.fillRect(qx - 7, qy - 7, qs + 14, qs + 26);
+          ctx.strokeStyle = 'rgba(70,55,40,.24)';
+          ctx.lineWidth = 1;
+          ctx.strokeRect(qx - 7, qy - 7, qs + 14, qs + 26);
+          drawImageContain(images.qr, qx, qy, qs, qs);
+          ctx.font = '800 10px system-ui, sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillStyle = 'rgba(55,42,32,.66)';
+          ctx.fillText('PROFILE', qx + qs / 2, qy + qs + 14);
+        } else {
+          drawQrFallbackDecoration(qx + 2, qy + 4);
+        }
+      });
+    }
+
+    function wrapLinesByChars(text, charsPerLine, maxLines) {
+      const result = [];
+      const rawLines = (text || '').replace(/\r/g, '').split('\n');
+      for (const rawLine of rawLines) {
+        const chars = Array.from(rawLine);
+        if (chars.length === 0) {
+          result.push('');
+        } else {
+          for (let i = 0; i < chars.length; i += charsPerLine) {
+            result.push(chars.slice(i, i + charsPerLine).join(''));
+            if (result.length >= maxLines) return result;
+          }
+        }
+        if (result.length >= maxLines) return result;
+      }
+      return result.slice(0, maxLines);
+    }
+
+    function drawMemoPaper() {
+      const x = 524, y = 58, w = 342, h = 242;
+      drawTape(x + 58, y - 16, 100, 28, 0.04, 'rgba(236, 222, 185, .78)');
+      drawTape(x + 205, y - 14, 88, 26, -0.08, 'rgba(214, 204, 170, .64)');
+      withRotation(x, y, w, h, 0.052, () => {
+        drawShadowPaper(0, 0, w, h, 14, '#fbf3d9', 'rgba(95,76,54,.22)');
+
+        ctx.fillStyle = 'rgba(72,56,42,.7)';
+        ctx.font = `900 22px ${SCRIPT_FONT}`;
+        ctx.fillText('Traveler Memo', 22, 38);
+        ctx.strokeStyle = 'rgba(154,126,84,.22)';
+        ctx.lineWidth = 1;
+        for (let i = 0; i < 5; i++) {
+          const ly = 70 + i * 32;
+          ctx.beginPath();
+          ctx.moveTo(20, ly + 12);
+          ctx.lineTo(w - 20, ly + 12);
+          ctx.stroke();
+        }
+
+        const lines = wrapLinesByChars(els.memo.value, 10, 5);
+        lines.forEach((line, i) => {
+          drawHandText(line, 25, 82 + i * 32, {
+            size: 28,
+            minSize: 20,
+            maxWidth: w - 50,
+            weight: 500,
+            color: '#3f342c',
+            baseline: 'middle',
+            jitter: 0.75,
+            rotate: 0.012,
+            tracking: -1.0
+          });
+        });
+      });
+    }
+
+    function getStampLayout(count) {
+      const layouts = {
+        1: [{ x: 171, y: 127, w: 198, h: 132 }],
+        2: [
+          { x: 105, y: 92, w: 154, h: 96 },
+          { x: 239, y: 160, w: 154, h: 96 }
+        ],
+        3: [
+          { x: 105, y: 88, w: 140, h: 84 },
+          { x: 238, y: 93, w: 140, h: 84 },
+          { x: 171, y: 169, w: 146, h: 86 }
+        ],
+        4: [
+          { x: 105, y: 87, w: 142, h: 82 },
+          { x: 238, y: 91, w: 142, h: 82 },
+          { x: 105, y: 166, w: 142, h: 82 },
+          { x: 238, y: 163, w: 142, h: 82 }
+        ],
+        5: [
+          { x: 68, y: 88, w: 116, h: 76 },
+          { x: 171, y: 84, w: 116, h: 76 },
+          { x: 274, y: 90, w: 116, h: 76 },
+          { x: 119, y: 166, w: 122, h: 78 },
+          { x: 223, y: 162, w: 122, h: 78 }
+        ],
+        6: [
+          { x: 68, y: 87, w: 116, h: 76 },
+          { x: 171, y: 83, w: 116, h: 76 },
+          { x: 274, y: 89, w: 116, h: 76 },
+          { x: 68, y: 163, w: 116, h: 76 },
+          { x: 171, y: 159, w: 116, h: 76 },
+          { x: 274, y: 165, w: 116, h: 76 }
+        ]
+      };
+      return layouts[count] || [];
+    }
+
+    function stampPath(shape, w, h) {
+      ctx.beginPath();
+      if (shape === 'circle') {
+        const d = Math.min(w, h);
+        ctx.ellipse(0, 0, d / 2, d / 2, 0, 0, Math.PI * 2);
+      } else if (shape === 'ellipse') {
+        ctx.ellipse(0, 0, w / 2, h / 2, 0, 0, Math.PI * 2);
+      } else if (shape === 'vertical') {
+        ctx.ellipse(0, 0, Math.min(w * .38, h * .46), h / 2, 0, 0, Math.PI * 2);
+      } else if (shape === 'square') {
+        const d = Math.min(w, h);
+        roundRect(ctx, -d / 2, -d / 2, d, d, Math.max(5, d * .10));
+      } else {
+        roundRect(ctx, -w / 2, -h / 2, w, h, Math.max(7, h * .18));
+      }
+      ctx.closePath();
+    }
+
+    function drawStampStar(x, y, r, color) {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 1.1;
+      ctx.beginPath();
+      for (let i = 0; i < 10; i++) {
+        const radius = i % 2 === 0 ? r : r * .42;
+        const angle = -Math.PI / 2 + i * Math.PI / 5;
+        const px = Math.cos(angle) * radius;
+        const py = Math.sin(angle) * radius;
+        if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+      }
+      ctx.closePath();
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawStampDecor(def, w, h, color) {
+      ctx.save();
+      ctx.strokeStyle = color;
+      ctx.fillStyle = color;
+      ctx.lineWidth = Math.max(1, Math.min(w, h) * .018);
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+
+      const dot = (x, y, radius = Math.max(1.2, h * .022)) => {
+        ctx.beginPath();
+        ctx.arc(x, y, radius, 0, Math.PI * 2);
+        ctx.fill();
+      };
+
+      const wave = (x1, x2, y, amplitude) => {
+        const span = x2 - x1;
+        ctx.beginPath();
+        ctx.moveTo(x1, y);
+        ctx.bezierCurveTo(x1 + span * .16, y - amplitude, x1 + span * .18, y + amplitude, x1 + span * .34, y);
+        ctx.bezierCurveTo(x1 + span * .50, y - amplitude, x1 + span * .52, y + amplitude, x1 + span * .68, y);
+        ctx.bezierCurveTo(x1 + span * .84, y - amplitude, x1 + span * .86, y + amplitude, x2, y);
+        ctx.stroke();
+      };
+
+      switch (def.decor) {
+        case 'casual':
+          drawStampStar(-w * .25, -h * .03, Math.max(3, h * .075), color);
+          drawStampStar(w * .25, h * .03, Math.max(3, h * .075), color);
+          break;
+
+        case 'story':
+          ctx.font = `700 ${Math.max(7, h * .12)}px "Courier New", monospace`;
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText('07·14', 0, h * .29);
+          ctx.beginPath();
+          ctx.moveTo(-w * .28, -h * .27); ctx.lineTo(-w * .11, -h * .27);
+          ctx.moveTo(w * .11, -h * .27); ctx.lineTo(w * .28, -h * .27);
+          ctx.moveTo(-w * .25, h * .34); ctx.lineTo(-w * .11, h * .34);
+          ctx.moveTo(w * .11, h * .34); ctx.lineTo(w * .25, h * .34);
+          ctx.stroke();
+          break;
+
+        case 'battle':
+          [-h * .31, h * .31].forEach(y => {
+            for (let i = -1; i <= 1; i++) {
+              const cx = i * w * .11;
+              ctx.beginPath();
+              ctx.moveTo(cx - w * .035, y);
+              ctx.lineTo(cx + w * .035, y);
+              ctx.stroke();
+            }
+          });
+          break;
+
+        case 'highEnd':
+          drawStampStar(-w * .34, 0, Math.max(3, h * .068), color);
+          drawStampStar(w * .34, 0, Math.max(3, h * .068), color);
+          break;
+
+        case 'pvp':
+          ctx.beginPath();
+          ctx.moveTo(-w * .39, h * .24); ctx.lineTo(-w * .25, -h * .25);
+          ctx.moveTo(-w * .32, h * .24); ctx.lineTo(-w * .18, -h * .25);
+          ctx.stroke();
+          wave(-w * .18, w * .27, h * .31, h * .055);
+          break;
+
+        case 'gpose':
+          [[-1, -1], [1, -1], [-1, 1], [1, 1]].forEach(([sx, sy]) => {
+            const x = sx * w * .31;
+            const y = sy * h * .31;
+            ctx.beginPath();
+            ctx.moveTo(x, y - sy * h * .08);
+            ctx.lineTo(x, y);
+            ctx.lineTo(x - sx * w * .08, y);
+            ctx.stroke();
+          });
+          break;
+
+        case 'housing':
+          ctx.beginPath();
+          ctx.moveTo(-w * .22, h * .31); ctx.lineTo(-w * .08, h * .31);
+          ctx.moveTo(w * .08, h * .31); ctx.lineTo(w * .22, h * .31);
+          ctx.stroke();
+          dot(-w * .31, h * .31);
+          dot(0, h * .31);
+          dot(w * .31, h * .31);
+          break;
+
+        case 'crafting':
+          [-1, 1].forEach(side => {
+            dot(side * w * .31, -h * .06, Math.max(1.5, h * .028));
+            dot(side * w * .31, h * .08, Math.max(1.1, h * .020));
+          });
+          break;
+
+        case 'gathering':
+          ctx.setLineDash([3, 3]);
+          ctx.beginPath();
+          ctx.moveTo(-w * .25, h * .32);
+          ctx.lineTo(w * .25, h * .32);
+          ctx.stroke();
+          ctx.setLineDash([]);
+          break;
+
+        case 'fishing':
+          wave(-w * .31, w * .20, h * .28, h * .07);
+          dot(w * .25, h * .23);
+          dot(w * .31, h * .29);
+          dot(w * .37, h * .22);
+          break;
+
+        case 'treasure':
+          ctx.setLineDash([3, 3]);
+          ctx.beginPath();
+          ctx.moveTo(-w * .33, h * .25);
+          ctx.quadraticCurveTo(-w * .08, h * .04, w * .20, h * .23);
+          ctx.stroke();
+          ctx.setLineDash([]);
+          ctx.beginPath();
+          ctx.moveTo(w * .25, h * .15); ctx.lineTo(w * .34, h * .30);
+          ctx.moveTo(w * .34, h * .15); ctx.lineTo(w * .25, h * .30);
+          ctx.stroke();
+          break;
+
+        case 'deepDungeon':
+          for (let i = -2; i <= 2; i++) {
+            const x = i * w * .075;
+            const top = h * (.28 + Math.abs(i) * .012);
+            ctx.beginPath();
+            ctx.moveTo(x, top);
+            ctx.lineTo(x, h * .40);
+            ctx.stroke();
+          }
+          break;
+
+        case 'roleplay':
+          [-1, 1].forEach(side => {
+            const y = side * h * .29;
+            ctx.beginPath();
+            ctx.moveTo(-w * .31, y);
+            ctx.bezierCurveTo(-w * .19, y - side * h * .10, -w * .08, y + side * h * .10, 0, y);
+            ctx.bezierCurveTo(w * .08, y - side * h * .10, w * .19, y + side * h * .10, w * .31, y);
+            ctx.stroke();
+          });
+          break;
+
+        case 'social':
+          for (let i = 0; i < 12; i++) {
+            const angle = i * Math.PI * 2 / 12;
+            dot(Math.cos(angle) * w * .31, Math.sin(angle) * h * .31, Math.max(1, h * .017));
+          }
+          break;
+
+        case 'performance':
+          wave(-w * .23, w * .23, h * .28, h * .055);
+          drawStampStar(-w * .36, h * .25, Math.max(2.8, h * .058), color);
+          drawStampStar(w * .36, h * .25, Math.max(2.8, h * .058), color);
+          break;
+      }
+
+      ctx.restore();
+    }
+
+    function drawStampDistress(name, w, h, color) {
+      const seed = Array.from(name).reduce((sum, ch) => sum + ch.charCodeAt(0), 0);
+      ctx.save();
+      ctx.strokeStyle = color;
+      ctx.globalAlpha = .22;
+      ctx.lineWidth = 1;
+      for (let i = 0; i < 5; i++) {
+        const x = ((seed * (i + 3) * 17) % 83) / 83 * w - w / 2;
+        const y = ((seed * (i + 5) * 23) % 71) / 71 * h - h / 2;
+        const len = 5 + ((seed + i * 11) % 10);
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.lineTo(x + len, y + ((i % 3) - 1) * 1.8);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    function drawSingleStamp(name, slot, index) {
+      const def = STAMP_DEFINITIONS[name];
+      if (!def) return;
+      const color = STAMP_COLORS[def.group];
+      let w = slot.w;
+      let h = slot.h;
+
+      if (def.shape === 'circle' || def.shape === 'square') {
+        const d = Math.min(w, h);
+        w = d;
+        h = d;
+      } else if (def.shape === 'vertical') {
+        w = Math.min(w * .72, h * .82);
+      }
+
+      ctx.save();
+      ctx.translate(slot.x, slot.y);
+      ctx.rotate(def.angle);
+      ctx.globalAlpha = .88;
+      ctx.strokeStyle = color;
+      ctx.fillStyle = color;
+      ctx.lineWidth = Math.max(1.5, Math.min(w, h) * .027);
+
+      if (def.frame === 'dashed') ctx.setLineDash([5, 3]);
+      stampPath(def.shape, w, h);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      if (def.frame === 'double') {
+        ctx.save();
+        ctx.scale(.87, .82);
+        ctx.lineWidth = Math.max(1, Math.min(w, h) * .018);
+        stampPath(def.shape, w, h);
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      drawStampDecor(def, w, h, color);
+
+      const lines = def.lines;
+      const maxLineLength = Math.max(...lines.map(line => line.length));
+      const baseSize = Math.max(8, Math.min(h * (lines.length > 1 ? .22 : .28), w / Math.max(4.2, maxLineLength * .62)));
+      ctx.font = `900 ${baseSize}px "Courier New", system-ui, sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillStyle = color;
+      const lineGap = baseSize * .90;
+      const startY = -((lines.length - 1) * lineGap) / 2 - h * .02;
+      lines.forEach((line, lineIndex) => {
+        ctx.fillText(line, 0, startY + lineIndex * lineGap, w * .72);
+      });
+
+      drawStampDistress(name, w, h, color);
+      ctx.restore();
+    }
+
+    function drawStampPaper() {
+      const x = 524, y = 58, w = 342, h = 242;
+      drawTape(x + 58, y - 16, 100, 28, 0.04, 'rgba(236, 222, 185, .78)');
+      drawTape(x + 205, y - 14, 88, 26, -0.08, 'rgba(214, 204, 170, .64)');
+      withRotation(x, y, w, h, 0.052, () => {
+        drawShadowPaper(0, 0, w, h, 14, '#fbf3d9', 'rgba(95,76,54,.22)');
+        const stamps = getSelectedStamps().slice(0, STAMP_LIMIT);
+        const layout = getStampLayout(stamps.length);
+        stamps.forEach((name, index) => drawSingleStamp(name, layout[index], index));
+      });
+    }
+
+    function drawTravelerArea() {
+      if (getTravelerMode() === 'stamp') {
+        drawStampPaper();
+      } else {
+        drawMemoPaper();
+      }
+    }
+
+    function drawReceiptRow(label, text, x, y) {
+      ctx.save();
+      ctx.fillStyle = 'rgba(52,46,40,.7)';
+      ctx.font = '800 12px "Courier New", monospace';
+      ctx.textAlign = 'left';
+      ctx.fillText(label, x, y);
+      ctx.fillStyle = '#2f2a24';
+      const safe = text || '—';
+      const size = fitText(safe, 128, 15, 9, 900, '"Courier New", monospace');
+      ctx.font = `900 ${size}px "Courier New", monospace`;
+      ctx.textAlign = 'right';
+      ctx.fillText(safe, x + 188, y);
+      ctx.restore();
+    }
+
+    function drawReceipt() {
+      const x = 898, y = 88, w = 226, h = 254;
+      drawTape(x + 52, y - 20, 116, 28, -0.10);
+      withRotation(x, y, w, h, -0.052, () => {
+        ctx.save();
+        ctx.shadowColor = 'rgba(44,35,24,.20)';
+        ctx.shadowBlur = 18;
+        ctx.shadowOffsetY = 12;
+        ctx.fillStyle = '#fff7e8';
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(w, 0);
+        ctx.lineTo(w, h - 12);
+        for (let i = 0; i < 10; i++) {
+          const px = w - i * (w / 9);
+          ctx.lineTo(px - w / 18, h);
+          ctx.lineTo(px - w / 9, h - 12);
+        }
+        ctx.closePath();
+        ctx.fill();
+        ctx.shadowColor = 'transparent';
+        ctx.strokeStyle = 'rgba(70,55,40,.2)';
+        ctx.stroke();
+        ctx.restore();
+
+        ctx.fillStyle = '#2f2a24';
+        ctx.font = '900 18px "Courier New", monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText('INN RECEIPT', w / 2, 35);
+        ctx.font = '800 10px "Courier New", monospace';
+        ctx.fillStyle = 'rgba(52,46,40,.55)';
+        ctx.fillText('ADVENTURER LODGING NOTE', w / 2, 51);
+        ctx.setLineDash([4, 5]);
+        ctx.strokeStyle = 'rgba(52,46,40,.35)';
+        ctx.beginPath();
+        ctx.moveTo(18, 68);
+        ctx.lineTo(w - 18, 68);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        drawReceiptRow('ACTIVE', getActiveTimeLabel(), 18, 101);
+        drawReceiptRow('VC', value('vc'), 18, 135);
+        drawReceiptRow('LANG', getLanguageLabel(), 18, 169);
+
+        ctx.setLineDash([4, 5]);
+        ctx.strokeStyle = 'rgba(52,46,40,.35)';
+        ctx.beginPath();
+        ctx.moveTo(18, 196);
+        ctx.lineTo(w - 18, 196);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.textAlign = 'center';
+        ctx.font = '800 11px "Courier New", monospace';
+        ctx.fillStyle = 'rgba(52,46,40,.56)';
+        ctx.fillText('WE HOPE TO SEE YOU AGAIN', w / 2, 224);
+      });
+    }
+
+    function drawPhotoUnderlay(x, y, w, h, rot) {
+      withRotation(x, y, w, h, rot, () => {
+        drawShadowPaper(0, 0, w, h, 8, '#d9cdb6', 'rgba(70,55,40,.12)');
+      });
+    }
+
+    function drawPolaroid(key, x, y, caption, tilt) {
+      const w = 242, h = 268;
+      const imgX = 20, imgY = 18, imgW = 202, imgH = 202;
+      drawTape(x + 34, y - 10, 78, 24, tilt - 0.05);
+      drawTape(x + 154, y - 7, 70, 22, tilt + 0.05, 'rgba(216, 207, 177, .62)');
+      withRotation(x, y, w, h, tilt || 0, () => {
+        ctx.shadowColor = 'rgba(44,35,24,.24)';
+        ctx.shadowBlur = 18;
+        ctx.shadowOffsetY = 12;
+        ctx.fillStyle = '#fffaf0';
+        ctx.fillRect(0, 0, w, h);
+        ctx.shadowColor = 'transparent';
+        ctx.strokeStyle = 'rgba(70,55,40,.18)';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(0, 0, w, h);
+
+        if (!drawImageCover(images[key], imgX, imgY, imgW, imgH, imageState[key], key === 'photo1' ? els.photo1Zoom.value : els.photo2Zoom.value)) {
+          drawPlaceholder(imgX, imgY, imgW, imgH, key === 'photo1' ? 'PHOTO 1' : 'PHOTO 2');
+        }
+
+        ctx.strokeStyle = 'rgba(60,45,32,.24)';
+        ctx.strokeRect(imgX, imgY, imgW, imgH);
+
+        const captionColor = getCaptionColor(key);
+        drawHandText(caption || '', w / 2, h - 22, {
+          size: 28,
+          minSize: 18,
+          maxWidth: w - 42,
+          weight: 600,
+          color: captionColor,
+          align: 'center',
+          baseline: 'alphabetic',
+          jitter: 0.55,
+          rotate: 0.012,
+          tracking: -0.5,
+          shadow: captionColor === '#fffaf0'
+        });
+      });
+    }
+
+    function drawCopyright() {
+      ctx.save();
+      ctx.textAlign = 'right';
+      ctx.font = '700 11px system-ui, sans-serif';
+      ctx.fillStyle = 'rgba(255,255,255,.68)';
+      ctx.fillText('Created by 鱗の旅人', W - 28, H - 42);
+      ctx.font = '700 12px system-ui, sans-serif';
+      ctx.fillStyle = 'rgba(255,255,255,.82)';
+      ctx.fillText('© SQUARE ENIX', W - 28, H - 24);
+      ctx.restore();
+    }
+
+    function drawTitleStamp() {
+      ctx.save();
+      ctx.translate(560, 28);
+      ctx.rotate(-0.018);
+      ctx.shadowColor = 'rgba(0,0,0,.40)';
+      ctx.shadowBlur = 8;
+      ctx.shadowOffsetY = 3;
+      ctx.fillStyle = 'rgba(255,255,255,.97)';
+      ctx.font = `900 25px ${SCRIPT_FONT}`;
+      ctx.fillText("FFXIV Adventurer's Scrapbook", 0, 0);
+      ctx.shadowColor = 'transparent';
+      ctx.font = '800 10px system-ui, sans-serif';
+      ctx.fillStyle = 'rgba(255,255,255,.78)';
+      ctx.fillText('a personal travel record', 3, 17);
+      ctx.restore();
+    }
+
+    function drawVignette() {
+      const g = ctx.createRadialGradient(W / 2, H / 2, 260, W / 2, H / 2, 760);
+      g.addColorStop(0, 'rgba(0,0,0,0)');
+      g.addColorStop(1, 'rgba(0,0,0,.18)');
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, W, H);
+    }
+
+    function draw() {
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.clearRect(0, 0, OUT_W, OUT_H);
+      ctx.save();
+      ctx.scale(OUT_W / W, OUT_H / H);
+
+      if (!drawBaseBackImage()) {
+        drawDeskBackground();
+        drawFixedDecorations();
+      }
+
+      drawTitleStamp();
+      drawTravelerArea();
+      drawReceipt();
+      drawPhotoUnderlay(584, 366, 218, 246, -0.08);
+      drawPhotoUnderlay(823, 380, 218, 246, 0.075);
+      drawPolaroid('photo1', 576, 362, value('caption1'), -0.065);
+      drawPolaroid('photo2', 814, 374, value('caption2'), 0.055);
+      drawAetherytePass();
+      drawVignette();
+      drawCopyright();
+      ctx.restore();
+    }
+
+    function pointerToCanvas(evt) {
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = W / rect.width;
+      const scaleY = H / rect.height;
+      return {
+        x: (evt.clientX - rect.left) * scaleX,
+        y: (evt.clientY - rect.top) * scaleY
+      };
+    }
+
+    function hitTest(point) {
+      for (const key of ['char', 'photo1', 'photo2']) {
+        const a = hitAreas[key];
+        if (point.x >= a.x && point.x <= a.x + a.w && point.y >= a.y && point.y <= a.y + a.h) {
+          return images[key] ? key : null;
+        }
+      }
+      return null;
+    }
+
+    canvas.addEventListener('pointerdown', (evt) => {
+      const point = pointerToCanvas(evt);
+      const key = hitTest(point);
+      if (!key) return;
+      dragTarget = key;
+      lastPointer = point;
+      canvas.classList.add('dragging');
+      canvas.setPointerCapture(evt.pointerId);
+    });
+
+    canvas.addEventListener('pointermove', (evt) => {
+      const point = pointerToCanvas(evt);
+      const hover = hitTest(point);
+      canvas.style.cursor = dragTarget ? 'grabbing' : hover ? 'grab' : 'default';
+      if (!dragTarget || !lastPointer) return;
+      const dx = point.x - lastPointer.x;
+      const dy = point.y - lastPointer.y;
+      imageState[dragTarget].offsetX += dx;
+      imageState[dragTarget].offsetY += dy;
+      lastPointer = point;
+      draw();
+    });
+
+    function endDrag(evt) {
+      dragTarget = null;
+      lastPointer = null;
+      canvas.classList.remove('dragging');
+      try { canvas.releasePointerCapture(evt.pointerId); } catch (e) {}
+    }
+
+    canvas.addEventListener('pointerup', endDrag);
+    canvas.addEventListener('pointercancel', endDrag);
+    canvas.addEventListener('pointerleave', () => {
+      if (!dragTarget) canvas.style.cursor = 'default';
+    });
+
+    els.charImage.addEventListener('change', () => loadImageFromInput(els.charImage, 'char'));
+    els.qrImage.addEventListener('change', () => loadImageFromInput(els.qrImage, 'qr'));
+    els.photo1.addEventListener('change', () => loadImageFromInput(els.photo1, 'photo1'));
+    els.photo2.addEventListener('change', () => loadImageFromInput(els.photo2, 'photo2'));
+
+    document.querySelectorAll('[data-clear]').forEach(btn => {
+      btn.addEventListener('click', () => clearImage(btn.dataset.clear));
+    });
+
+    els.dcWorldSelect.addEventListener('change', updateDcWorldCustomVisibility);
+    els.fontStyle.addEventListener('change', () => {
+      loadSelectedFont();
+    });
+
+    document.querySelectorAll('input[name="travelerMode"]').forEach(input => {
+      input.addEventListener('change', updateTravelerMode);
+    });
+
+    document.querySelectorAll('input[name="stamp"]').forEach(input => {
+      input.addEventListener('change', () => {
+        updateStampLimit(input);
+        draw();
+      });
+    });
+
+    document.querySelectorAll('input[type="text"], input[type="range"], textarea, select:not(#fontStyle), input[type="checkbox"]').forEach(el => {
+      el.addEventListener('input', draw);
+      el.addEventListener('change', draw);
+    });
+
+    els.downloadBtn.addEventListener('click', async () => {
+      const originalText = els.downloadBtn.textContent;
+      els.downloadBtn.disabled = true;
+      els.downloadBtn.textContent = 'PNG準備中…';
+
+      try {
+        await ensureSelectedFontReady();
+        draw();
+        await new Promise(resolve => requestAnimationFrame(() => resolve()));
+
+        canvas.toBlob(blob => {
+          if (!blob) {
+            els.downloadBtn.disabled = false;
+            els.downloadBtn.textContent = originalText;
+            return;
+          }
+
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'ffxiv-adventurers-scrapbook.png';
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          URL.revokeObjectURL(url);
+          els.downloadBtn.disabled = false;
+          els.downloadBtn.textContent = originalText;
+        }, 'image/png');
+      } catch (error) {
+        els.downloadBtn.disabled = false;
+        els.downloadBtn.textContent = originalText;
+      }
+    });
+
+    updateDcWorldCustomVisibility();
+    updateTravelerMode();
+    updateStampLimit();
+    loadSelectedFont();
+    draw();
+  </script>
+</body>
+</html>
