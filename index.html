@@ -1664,42 +1664,53 @@ SS撮影好き
       return result.slice(0, maxLines);
     }
 
-    function drawMemoPaper() {
-      const x = 524, y = 58, w = 342, h = 242;
-      drawTape(x + 58, y - 16, 100, 28, 0.04, 'rgba(236, 222, 185, .78)');
-      drawTape(x + 205, y - 14, 88, 26, -0.08, 'rgba(214, 204, 170, .64)');
-      withRotation(x, y, w, h, 0.052, () => {
-        drawShadowPaper(0, 0, w, h, 14, '#fbf3d9', 'rgba(95,76,54,.22)');
+<script>
+function drawMemoPaper() {
+  const x = 524, y = 58, w = 342, h = 242;
+  drawTape(x + 58, y - 16, 100, 28, 0.04, 'rgba(236, 222, 185, .78)');
+  drawTape(x + 205, y - 14, 88, 26, -0.08, 'rgba(214, 204, 170, .64)');
 
-        ctx.fillStyle = 'rgba(72,56,42,.7)';
-        ctx.font = `900 22px ${SCRIPT_FONT}`;
-        ctx.fillText('Traveler Memo', 22, 38);
-        ctx.strokeStyle = 'rgba(154,126,84,.22)';
-        ctx.lineWidth = 1;
-        for (let i = 0; i < 5; i++) {
-          const ly = 70 + i * 32;
-          ctx.beginPath();
-          ctx.moveTo(20, ly + 12);
-          ctx.lineTo(w - 20, ly + 12);
-          ctx.stroke();
-        }
+  withRotation(x, y, w, h, 0.052, () => {
+    drawShadowPaper(0, 0, w, h, 14, '#fbf3d9', 'rgba(95,76,54,.22)');
 
-        const lines = wrapLinesByChars(els.memo.value, 10, 5);
-        lines.forEach((line, i) => {
-          drawHandText(line, 25, 82 + i * 32, {
-            size: 28,
-            minSize: 20,
-            maxWidth: w - 50,
-            weight: 500,
-            color: '#3f342c',
-            baseline: 'middle',
-            jitter: 0.75,
-            rotate: 0.012,
-            tracking: -1.0
-          });
-        });
-      });
+    ctx.fillStyle = 'rgba(72,56,42,.7)';
+    ctx.font = `900 22px ${SCRIPT_FONT}`;
+    ctx.fillText('Traveler Memo', 22, 38);
+
+    const lineStartY = 82;
+    const linePitch = 32;
+    const textOffsetY = -6;
+
+    ctx.strokeStyle = 'rgba(154,126,84,.22)';
+    ctx.lineWidth = 1;
+
+    for (let i = 0; i < 5; i++) {
+      const lineY = lineStartY + i * linePitch;
+      ctx.beginPath();
+      ctx.moveTo(20, lineY);
+      ctx.lineTo(w - 20, lineY);
+      ctx.stroke();
     }
+
+    const lines = wrapLinesByChars(els.memo.value, 10, 5);
+    lines.forEach((line, i) => {
+      const textY = lineStartY + i * linePitch + textOffsetY;
+      drawHandText(line, 25, textY, {
+        size: 28,
+        minSize: 20,
+        maxWidth: w - 50,
+        weight: 500,
+        color: '#3f342c',
+        baseline: 'alphabetic',
+        jitter: 0.45,
+        rotate: 0.008,
+        tracking: -1.0
+      });
+    });
+  });
+}
+    
+</script>
 
     function getStampLayout(count) {
       // 正方形PNG内には透明余白があるため、見た目で差が分かる程度に
